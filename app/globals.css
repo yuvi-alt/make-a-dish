@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-feature-settings: "ss01", "ss02", "salt";
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-color: #fff9f3;
+  color: #2b1a14;
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: rgba(255, 138, 92, 0.25);
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.glass-surface {
+  @apply rounded-2xl border border-white/40 bg-white/75 shadow-brand-soft backdrop-blur-lg;
+}
+
+.section-heading {
+  @apply font-display text-3xl font-semibold tracking-tight text-brand-charcoal md:text-4xl;
+}
+
+.section-lead {
+  @apply max-w-2xl text-lg text-brand-charcoal/70;
+}
+
