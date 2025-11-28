@@ -1,82 +1,63 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { Button } from "./ui/button";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/contact", label: "Contact" },
+const navItems = [
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
+  { name: "How It Works", href: "/how-it-works" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export function SiteHeader() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const closeMenu = () => setIsOpen(false);
+  const pathname = usePathname();
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/50 bg-brand-cream/70 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="w-full border-b border-[#F1E9DD] bg-[#FCF9F4]/80 backdrop-blur-lg">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+
+        {/* LOGO */}
         <Link
           href="/"
-          onClick={closeMenu}
-          className="flex items-center gap-3 rounded-full bg-white/80 px-3 py-2 font-display text-lg font-semibold text-brand-charcoal shadow-brand-soft"
+          className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm"
         >
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-peach/60 text-brand-charcoal shadow-inner">
-            🥘
-          </span>
-          Make a Dish
+          <div className="h-6 w-6 rounded-full bg-orange-200 flex items-center justify-center text-orange-600 font-bold">
+            🍽️
+          </div>
+          <span className="text-lg font-semibold text-gray-900">Make a Dish</span>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-brand-charcoal md:flex">
-          {navLinks.map((link) => (
+
+        {/* NAVIGATION */}
+        <div className="hidden items-center space-x-8 md:flex">
+          {navItems.map((item) => (
             <Link
-              key={link.href}
-              href={link.href}
-              className="transition hover:text-brand-tangerine"
+              key={item.name}
+              href={item.href}
+              className={`text-[15px] font-medium transition hover:text-orange-600 ${
+                pathname === item.href ? "text-orange-600" : "text-gray-800"
+              }`}
             >
-              {link.label}
+              {item.name}
             </Link>
           ))}
-          <Button asChild variant="pill">
-            <Link href="/register/start">Register</Link>
-          </Button>
-        </nav>
-        <button
-          type="button"
-          aria-label="Toggle navigation menu"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white/80 text-brand-charcoal shadow-md md:hidden"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-      <div
-        className={cn(
-          "md:hidden",
-          isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
-        )}
-      >
-        <div className="space-y-4 border-t border-white/60 bg-white/95 px-6 py-4 text-base font-semibold text-brand-charcoal shadow-xl">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block rounded-xl bg-brand-cream px-4 py-3"
-              onClick={closeMenu}
-            >
-              {link.label}
+
+          {/* FIXED REGISTER BUTTON
+             Now visible, bright, modern, clickable */}
+          <Button
+            asChild
+            variant="primary"
+            className="px-5 py-2 rounded-full font-medium
+                       bg-gradient-to-r from-orange-400 to-orange-500
+                       text-white shadow-md hover:brightness-110"
+          >
+            <Link href="/register/start">
+              Register
             </Link>
-          ))}
-          <Button asChild className="w-full" variant="pill" onClick={closeMenu}>
-            <Link href="/register/start">Register</Link>
           </Button>
         </div>
-      </div>
+      </nav>
     </header>
   );
 }
-
