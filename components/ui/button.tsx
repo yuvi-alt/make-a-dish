@@ -10,29 +10,32 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "ghost" | "pill";
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
+const variantStyles: Record<NonNullable<ButtonProps["variant"]>, string> = {
+  primary:
+    "bg-gradient-to-r from-brand-tangerine to-brand-honey text-white shadow-brand px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition-all",
 
-    const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
-      primary:
-        "bg-gradient-to-r from-brand-tangerine to-brand-honey text-white shadow-sm hover:brightness-110 focus-visible:ring-2 focus-visible:ring-brand-tangerine/60",
-      secondary:
-        "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-sm",
-      ghost:
-        "bg-transparent hover:bg-gray-100 text-gray-700 shadow-none",
-      pill:
-        "bg-brand-green text-white px-5 py-2 rounded-full hover:opacity-90 shadow-md",
-    };
+  secondary:
+    "bg-white border border-gray-300 text-brand-charcoal px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-all",
+
+  ghost:
+    "bg-transparent text-gray-800 hover:bg-gray-100 px-4 py-2 rounded-md",
+
+  pill:
+    "rounded-full bg-brand-tangerine text-white px-6 py-2 shadow hover:brightness-110",
+};
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = "primary", asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
 
     return (
       <Comp
+        ref={ref}
         className={cn(
-          "inline-flex items-center justify-center font-medium rounded-md transition-all disabled:opacity-50 disabled:pointer-events-none",
-          variants[variant],
+          "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+          variantStyles[variant],
           className
         )}
-        ref={ref}
         {...props}
       />
     );
@@ -40,5 +43,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
-
-export { Button };
