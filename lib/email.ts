@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getAdminNotificationHTML, getUserConfirmationHTML } from "./email-templates";
 
 const emailHost = process.env.EMAIL_HOST;
 const emailPort = process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT, 10) : 587;
@@ -50,7 +51,8 @@ export async function sendAdminNotification(registrationData: {
     registrationData.postcode,
   ].filter(Boolean);
 
-  const body = `
+  const htmlBody = getAdminNotificationHTML(registrationData);
+  const textBody = `
 A new food business registration has been submitted.
 
 Registration ID: ${registrationData.registrationId}
@@ -72,7 +74,8 @@ ${JSON.stringify(registrationData.detailData, null, 2)}
     from: emailUser,
     to: adminEmail,
     subject: "New registration received",
-    text: body,
+    text: textBody,
+    html: htmlBody,
   });
 
   console.log("✅ Admin notification email sent successfully:", {
@@ -104,7 +107,8 @@ export async function sendUserConfirmation(userEmail: string, registrationData: 
     registrationData.postcode,
   ].filter(Boolean);
 
-  const body = `
+  const htmlBody = getUserConfirmationHTML(registrationData);
+  const textBody = `
 Thank you for registering your food business with us.
 
 Your registration has been successfully submitted and we have sent your details to the relevant local authority.
@@ -130,7 +134,8 @@ The Registration Team
     from: emailUser,
     to: userEmail,
     subject: "Thanks for registering your food business",
-    text: body,
+    text: textBody,
+    html: htmlBody,
   });
 
   console.log("✅ User confirmation email sent successfully:", {
