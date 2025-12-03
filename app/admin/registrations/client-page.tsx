@@ -420,7 +420,7 @@ export function AdminRegistrationsClient({
                 className="flex-1"
               />
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2"
               >
@@ -438,7 +438,7 @@ export function AdminRegistrationsClient({
                 )}
               </Button>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={clearFilters}>
+                <Button variant="secondary" onClick={clearFilters}>
                   <X className="h-4 w-4" />
                 </Button>
               )}
@@ -606,12 +606,11 @@ export function AdminRegistrationsClient({
                         </button>
                         <Button
                           variant="destructive"
-                          size="sm"
                           onClick={(e) =>
                             handleDelete(registration.registrationId, e)
                           }
                           disabled={deletingId === registration.registrationId}
-                          className="opacity-0 transition-opacity group-hover:opacity-100"
+                          className="opacity-0 transition-opacity group-hover:opacity-100 px-2 py-1 text-sm"
                         >
                           {deletingId === registration.registrationId ? (
                             "Deleting..."
@@ -635,7 +634,7 @@ export function AdminRegistrationsClient({
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                     >
@@ -657,7 +656,7 @@ export function AdminRegistrationsClient({
                               </span>
                             )}
                             <Button
-                              variant={currentPage === page ? "default" : "outline"}
+                              variant={currentPage === page ? "primary" : "secondary"}
                               onClick={() => setCurrentPage(page)}
                               className="min-w-[40px]"
                             >
@@ -667,7 +666,7 @@ export function AdminRegistrationsClient({
                         ))}
                     </div>
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       onClick={() =>
                         setCurrentPage((p) => Math.min(totalPages, p + 1))
                       }
