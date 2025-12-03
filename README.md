@@ -20,16 +20,29 @@ Next.js (App Router) application that recreates the GOV.UK food business registr
 
 ## Environment Variables
 
-Create a `.env.local` file with the required AWS credentials:
+Create a `.env.local` file with the required credentials:
 
 ```
 AWS_ACCESS_KEY_ID=XXXXXXXX
 AWS_SECRET_ACCESS_KEY=XXXXXXXX
 AWS_REGION=eu-west-2
 AWS_S3_BUCKET=food-registration-bucket
+NEXT_PUBLIC_GOOGLE_PLACES_KEY=your_google_places_api_key_here
 ```
 
 The application writes files to `s3://<bucket>/registrations/<registrationId>/`.
+
+### Setting Up Google Places API
+
+1. Get your API key from [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the following APIs:
+   - Places API
+   - Geocoding API
+3. Add the API key to your `.env.local` file
+4. **For Vercel deployment**: Add the environment variable in Vercel dashboard:
+   - Go to your project → Settings → Environment Variables
+   - Add `NEXT_PUBLIC_GOOGLE_PLACES_KEY` with your API key value
+   - Redeploy your application
 
 ## Development
 
