@@ -115,9 +115,9 @@ export default function TestEmailPage() {
             <h3 className="mb-3 font-semibold text-blue-900">Setup Instructions:</h3>
             <ol className="list-decimal space-y-2 pl-5 text-sm text-blue-800">
               <li>Make sure you have set all email environment variables in your <code className="bg-blue-100 px-1 rounded">.env.local</code> file</li>
-              <li>For Gmail, you need to use an "App Password" (not your regular password)</li>
+              <li>For Gmail, you need to use an &quot;App Password&quot; (not your regular password)</li>
               <li>To generate an App Password: Google Account → Security → 2-Step Verification → App Passwords</li>
-              <li>Check your spam folder if the email doesn't arrive</li>
+              <li>Check your spam folder if the email doesn&apos;t arrive</li>
               <li>Check server logs for detailed error messages</li>
             </ol>
           </div>

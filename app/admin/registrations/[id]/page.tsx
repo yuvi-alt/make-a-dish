@@ -41,7 +41,7 @@ export default async function AdminRegistrationDetailPage({
         <div className="glass-surface rounded-[32px] bg-white/90 p-8 shadow-brand">
           <h1 className="text-3xl font-semibold text-brand-charcoal">Registration Not Found</h1>
           <p className="mt-4 text-lg text-brand-charcoal/70">
-            The registration you're looking for doesn't exist.
+            The registration you&apos;re looking for doesn&apos;t exist.
           </p>
           <Link
             href="/admin/registrations"

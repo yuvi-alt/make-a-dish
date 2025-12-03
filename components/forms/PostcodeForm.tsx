@@ -410,7 +410,7 @@ export function PostcodeForm({
                 <p className="text-sm text-[#C2483C]">{fieldState.error.message}</p>
               ) : (
                 <p className="text-sm text-brand-charcoal/70">
-                  We'll send a confirmation email to this address.
+                  We&apos;ll send a confirmation email to this address.
                 </p>
               )}
             </FormItem>
@@ -470,6 +470,7 @@ export function PostcodeForm({
                   key={prediction.place_id}
                   type="button"
                   role="option"
+                  aria-selected={selectedPlaceId === prediction.place_id}
                   onClick={() => handleSuggestionSelect(prediction)}
                   className="w-full rounded-xl px-4 py-3 text-left transition hover:bg-brand-peach/20 focus:bg-brand-peach/20 focus:outline-none"
                 >
