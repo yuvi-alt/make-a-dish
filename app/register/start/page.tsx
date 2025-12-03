@@ -13,8 +13,8 @@ export default async function StartPage() {
 
   return (
     <FormShell
-      title="Enter the postcode of your food business"
-      description="We use your postcode to notify the correct local authority."
+      title="Enter your address"
+      description="Search for your business address using Google Places lookup."
       currentStep="postcode"
     >
       <PostcodeForm registrationId={registrationId} initialValues={existing ?? undefined} />

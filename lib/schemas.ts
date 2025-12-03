@@ -8,16 +8,7 @@ const phoneRegex = /^[+()0-9\s-]{7,20}$/;
 const companiesHouseRegex = /^[A-Z0-9]{6,8}$/i;
 
 export const postcodeSchema = z.object({
-  postcode: z
-    .string()
-    .trim()
-    .min(1, "Enter a postcode")
-    .regex(ukPostcodeRegex, "Enter a valid UK postcode")
-    .transform((value) => {
-      const cleaned = value.toUpperCase().replace(/\s+/g, "");
-      if (cleaned.length <= 3) return cleaned;
-      return `${cleaned.slice(0, cleaned.length - 3)} ${cleaned.slice(-3)}`;
-    }),
+  postcode: z.string().trim().min(1, "Enter a postcode"),
   addressLine1: z.string().trim().min(1, "Enter address line 1"),
   addressLine2: z.string().trim().optional().or(z.literal("")),
   city: z.string().trim().min(1, "Enter a city or town"),
