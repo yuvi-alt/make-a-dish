@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  variant?: "primary" | "secondary" | "ghost" | "pill";
+  variant?: "primary" | "secondary" | "ghost" | "pill" | "destructive";
 }
 
 const variantStyles: Record<NonNullable<ButtonProps["variant"]>, string> = {
@@ -22,6 +22,9 @@ const variantStyles: Record<NonNullable<ButtonProps["variant"]>, string> = {
 
   pill:
     "rounded-full bg-brand-tangerine text-white px-6 py-2 shadow hover:brightness-110",
+
+  destructive:
+    "bg-red-600 text-white px-4 py-2 rounded-md font-medium hover:bg-red-700 transition-all",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

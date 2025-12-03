@@ -58,6 +58,7 @@ export function PostcodeForm({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const defaultValues: PostcodePayload = {
+    email: initialValues?.email ?? "",
     postcode: initialValues?.postcode ?? "",
     addressLine1: initialValues?.addressLine1 ?? "",
     addressLine2: initialValues?.addressLine2 ?? "",
@@ -74,6 +75,7 @@ export function PostcodeForm({
   useEffect(() => {
     if (initialValues) {
       form.reset({
+        email: initialValues.email ?? "",
         postcode: initialValues.postcode ?? "",
         addressLine1: initialValues.addressLine1 ?? "",
         addressLine2: initialValues.addressLine2 ?? "",
@@ -387,6 +389,33 @@ export function PostcodeForm({
         <ErrorSummary errors={errorSummary} />
         <FormErrorBanner message={serverError} />
         
+        {/* Email Field */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <FormItem>
+              <FormLabel htmlFor="email">Email address</FormLabel>
+              <FormControl>
+                <Input
+                  id="email"
+                  type="email"
+                  {...field}
+                  placeholder="your.email@example.com"
+                  aria-invalid={!!fieldState.error}
+                  className="max-w-md"
+                />
+              </FormControl>
+              {fieldState.error ? (
+                <p className="text-sm text-[#C2483C]">{fieldState.error.message}</p>
+              ) : (
+                <p className="text-sm text-brand-charcoal/70">
+                  We'll send a confirmation email to this address.
+                </p>
+              )}
+            </FormItem>
+          )}
+        />
         
         {/* Address Search Input */}
         <div className="relative">

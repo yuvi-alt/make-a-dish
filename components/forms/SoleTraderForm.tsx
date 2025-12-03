@@ -34,6 +34,7 @@ export function SoleTraderForm({
       lastName: "",
       birthdate: "",
       postcode: "",
+      phoneNumber: "",
     },
   });
 
@@ -152,6 +153,27 @@ export function SoleTraderForm({
                   {...field}
                   aria-invalid={!!fieldState.error}
                   className="uppercase"
+                />
+              </FormControl>
+              {fieldState.error ? (
+                <p className="text-sm text-[#C2483C]">{fieldState.error.message}</p>
+              ) : null}
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field, fieldState }) => (
+            <FormItem>
+              <FormLabel htmlFor="phoneNumber">Phone number</FormLabel>
+              <FormControl>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  {...field}
+                  aria-invalid={!!fieldState.error}
+                  placeholder="e.g. 07123456789"
                 />
               </FormControl>
               {fieldState.error ? (
