@@ -99,8 +99,9 @@ export async function POST(request: Request) {
     data: finalPayload,
   });
 
-  // Send emails asynchronously (don't block response)
-  Promise.all([
+  // Send emails - await to ensure they complete on serverless
+  // Use Promise.allSettled to wait for both, but don't fail if one fails
+  await Promise.allSettled([
     sendAdminNotification({
       ...finalPayload,
       entityType: entityTypeData.entityType,
@@ -115,6 +116,7 @@ export async function POST(request: Request) {
         hasPass: !!process.env.EMAIL_PASS,
         adminEmail: process.env.ADMIN_EMAIL ? "Set" : "NOT SET",
       });
+      throw err; // Re-throw to be caught by allSettled
     }),
     sendUserConfirmation(postcodeData.email, {
       registrationId: payload.registrationId,
@@ -130,9 +132,17 @@ export async function POST(request: Request) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error("❌ Failed to send user confirmation:", errorMessage);
       console.error("Error details:", err);
+      throw err; // Re-throw to be caught by allSettled
     }),
-  ]).catch(() => {
-    // Silent fail - emails are best effort
+  ]).then((results) => {
+    // Log results for debugging
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(`Email ${index === 0 ? "admin" : "user"} failed:`, result.reason);
+      } else {
+        console.log(`✅ Email ${index === 0 ? "admin" : "user"} sent successfully`);
+      }
+    });
   });
 
   const cookieStore = await cookies();
