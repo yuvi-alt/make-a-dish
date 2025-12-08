@@ -99,51 +99,53 @@ export async function POST(request: Request) {
     data: finalPayload,
   });
 
-  // Send emails - await to ensure they complete on serverless
-  // Use Promise.allSettled to wait for both, but don't fail if one fails
-  await Promise.allSettled([
-    sendAdminNotification({
-      ...finalPayload,
-      entityType: entityTypeData.entityType,
-    }).catch((err) => {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Failed to send admin notification:", errorMessage);
-      console.error("Error details:", err);
-      // Log configuration status
-      console.error("Email config check:", {
-        hasHost: !!process.env.EMAIL_HOST,
-        hasUser: !!process.env.EMAIL_USER,
-        hasPass: !!process.env.EMAIL_PASS,
-        adminEmail: process.env.ADMIN_EMAIL ? "Set" : "NOT SET",
+  // Send emails - await to ensure they complete on serverless (Vercel)
+  // Use Promise.allSettled to wait for both without failing if one fails
+  try {
+    await Promise.allSettled([
+      sendAdminNotification({
+        ...finalPayload,
+        entityType: entityTypeData.entityType,
+      }),
+      sendUserConfirmation(postcodeData.email, {
+        registrationId: payload.registrationId,
+        postcode: postcodeData.postcode,
+        addressLine1: postcodeData.addressLine1,
+        addressLine2: postcodeData.addressLine2,
+        city: postcodeData.city,
+        county: postcodeData.county,
+        country: postcodeData.country,
+        entityType: entityTypeData.entityType,
+        submittedAt,
+        detailData,
+      }),
+    ]).then((results) => {
+      // Log results for debugging
+      results.forEach((result, index) => {
+        if (result.status === "rejected") {
+          const emailType = index === 0 ? "admin" : "user";
+          console.error(`❌ Failed to send ${emailType} email:`, result.reason);
+          if (index === 0) {
+            // Log configuration status for admin email failures
+            console.error("Email config check:", {
+              hasHost: !!process.env.EMAIL_HOST,
+              hasUser: !!process.env.EMAIL_USER,
+              hasPass: !!process.env.EMAIL_PASS,
+              adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL ? "Set" : "NOT SET",
+              adminEmail: process.env.ADMIN_EMAIL ? "Set (fallback)" : "NOT SET",
+            });
+          }
+        } else {
+          const emailType = index === 0 ? "admin" : "user";
+          console.log(`✅ ${emailType} email sent successfully`);
+        }
       });
-      throw err; // Re-throw to be caught by allSettled
-    }),
-    sendUserConfirmation(postcodeData.email, {
-      registrationId: payload.registrationId,
-      postcode: postcodeData.postcode,
-      addressLine1: postcodeData.addressLine1,
-      addressLine2: postcodeData.addressLine2,
-      city: postcodeData.city,
-      county: postcodeData.county,
-      country: postcodeData.country,
-      entityType: entityTypeData.entityType,
-      submittedAt,
-    }).catch((err) => {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Failed to send user confirmation:", errorMessage);
-      console.error("Error details:", err);
-      throw err; // Re-throw to be caught by allSettled
-    }),
-  ]).then((results) => {
-    // Log results for debugging
-    results.forEach((result, index) => {
-      if (result.status === "rejected") {
-        console.error(`Email ${index === 0 ? "admin" : "user"} failed:`, result.reason);
-      } else {
-        console.log(`✅ Email ${index === 0 ? "admin" : "user"} sent successfully`);
-      }
     });
-  });
+  } catch (error) {
+    // Catch any unexpected errors in the promise handling
+    console.error("Unexpected error sending emails:", error);
+    // Don't fail the request - emails are best effort
+  }
 
   const cookieStore = await cookies();
   cookieStore.delete(REGISTRATION_COOKIE);

@@ -5,7 +5,8 @@ const emailHost = process.env.EMAIL_HOST;
 const emailPort = process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT, 10) : 587;
 const emailUser = process.env.EMAIL_USER;
 const emailPass = process.env.EMAIL_PASS;
-const adminEmail = process.env.ADMIN_EMAIL;
+// Use ADMIN_NOTIFICATION_EMAIL if set, otherwise fall back to ADMIN_EMAIL
+const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL;
 
 function getTransporter() {
   if (!emailHost || !emailUser || !emailPass) {
@@ -37,7 +38,7 @@ export async function sendAdminNotification(registrationData: {
   submittedAt: string;
 }) {
   if (!adminEmail) {
-    throw new Error("ADMIN_EMAIL environment variable is not set");
+    throw new Error("ADMIN_NOTIFICATION_EMAIL or ADMIN_EMAIL environment variable is not set");
   }
 
   const transporter = getTransporter();
@@ -73,7 +74,7 @@ ${JSON.stringify(registrationData.detailData, null, 2)}
   const info = await transporter.sendMail({
     from: emailUser,
     to: adminEmail,
-    subject: "New registration received",
+    subject: "New Make a Dish registration submitted",
     text: textBody,
     html: htmlBody,
   });
@@ -95,6 +96,7 @@ export async function sendUserConfirmation(userEmail: string, registrationData: 
   country: string;
   entityType: string;
   submittedAt: string;
+  detailData?: unknown;
 }) {
   const transporter = getTransporter();
 
@@ -107,6 +109,31 @@ export async function sendUserConfirmation(userEmail: string, registrationData: 
     registrationData.postcode,
   ].filter(Boolean);
 
+  // Helper to extract business name from detail data
+  const getBusinessName = (detailData: unknown, entityType: string): string => {
+    if (!detailData || typeof detailData !== "object") return "";
+    const data = detailData as Record<string, unknown>;
+    if (entityType === "limited-company" && typeof data.companyName === "string") {
+      return data.companyName;
+    }
+    if (entityType === "organisation" && typeof data.trustName === "string") {
+      return data.trustName;
+    }
+    if (entityType === "sole-trader") {
+      const firstName = typeof data.firstName === "string" ? data.firstName : "";
+      const lastName = typeof data.lastName === "string" ? data.lastName : "";
+      return [firstName, lastName].filter(Boolean).join(" ") || "";
+    }
+    if (entityType === "partnership" && typeof data.mainContact === "string") {
+      return data.mainContact;
+    }
+    return "";
+  };
+
+  const businessName = registrationData.detailData 
+    ? getBusinessName(registrationData.detailData, registrationData.entityType)
+    : "";
+
   const htmlBody = getUserConfirmationHTML(registrationData);
   const textBody = `
 Thank you for registering your food business with us.
@@ -114,13 +141,13 @@ Thank you for registering your food business with us.
 Your registration has been successfully submitted and we have sent your details to the relevant local authority.
 
 Registration Details:
-- Registration ID: ${registrationData.registrationId}
+${businessName ? `- Business Name: ${businessName}\n` : ""}- Registration ID: ${registrationData.registrationId}
 - Submitted: ${new Date(registrationData.submittedAt).toLocaleString()}
+- Entity Type: ${registrationData.entityType}
+- Postcode: ${registrationData.postcode}
 
 Business Address:
 ${addressParts.join("\n")}
-
-Legal Entity Type: ${registrationData.entityType}
 
 You only need to register your food business once, unless any of your details change. The local authority will be in touch if they need more information.
 
@@ -133,7 +160,7 @@ The Registration Team
   const info = await transporter.sendMail({
     from: emailUser,
     to: userEmail,
-    subject: "Thanks for registering your food business",
+    subject: "We've received your Make a Dish registration",
     text: textBody,
     html: htmlBody,
   });

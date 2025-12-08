@@ -79,6 +79,30 @@ export function getAdminNotificationHTML(registrationData: {
   `.trim();
 }
 
+// Helper to extract business name from detail data
+function getBusinessName(detailData: unknown, entityType: string): string {
+  if (!detailData || typeof detailData !== "object") return "";
+  
+  const data = detailData as Record<string, unknown>;
+  
+  if (entityType === "limited-company" && typeof data.companyName === "string") {
+    return data.companyName;
+  }
+  if (entityType === "organisation" && typeof data.trustName === "string") {
+    return data.trustName;
+  }
+  if (entityType === "sole-trader") {
+    const firstName = typeof data.firstName === "string" ? data.firstName : "";
+    const lastName = typeof data.lastName === "string" ? data.lastName : "";
+    return [firstName, lastName].filter(Boolean).join(" ") || "";
+  }
+  if (entityType === "partnership" && typeof data.mainContact === "string") {
+    return data.mainContact;
+  }
+  
+  return "";
+}
+
 export function getUserConfirmationHTML(registrationData: {
   registrationId: string;
   postcode: string;
@@ -89,6 +113,7 @@ export function getUserConfirmationHTML(registrationData: {
   country: string;
   entityType: string;
   submittedAt: string;
+  detailData?: unknown;
 }): string {
   const addressParts = [
     registrationData.addressLine1,
@@ -98,6 +123,10 @@ export function getUserConfirmationHTML(registrationData: {
     registrationData.country,
     registrationData.postcode,
   ].filter(Boolean);
+
+  const businessName = registrationData.detailData 
+    ? getBusinessName(registrationData.detailData, registrationData.entityType)
+    : "";
 
   return `
 <!DOCTYPE html>
@@ -118,6 +147,10 @@ export function getUserConfirmationHTML(registrationData: {
     <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
       <h2 style="color: #ff6b35; margin-top: 0; font-size: 18px;">Registration Details</h2>
       <table style="width: 100%; border-collapse: collapse;">
+        ${businessName ? `<tr>
+          <td style="padding: 8px 0; font-weight: bold; width: 40%;">Business Name:</td>
+          <td style="padding: 8px 0;">${businessName}</td>
+        </tr>` : ""}
         <tr>
           <td style="padding: 8px 0; font-weight: bold; width: 40%;">Registration ID:</td>
           <td style="padding: 8px 0; font-family: monospace;">${registrationData.registrationId}</td>
@@ -129,6 +162,10 @@ export function getUserConfirmationHTML(registrationData: {
         <tr>
           <td style="padding: 8px 0; font-weight: bold;">Entity Type:</td>
           <td style="padding: 8px 0;">${registrationData.entityType}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">Postcode:</td>
+          <td style="padding: 8px 0;">${registrationData.postcode}</td>
         </tr>
       </table>
     </div>

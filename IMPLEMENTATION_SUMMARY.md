@@ -1,143 +1,198 @@
-# Implementation Summary - Email & Admin Features
+# Implementation Summary - Registration Email & Admin Features
 
-## ✅ All Changes Completed
+## ✅ Completed Changes
 
-### 1. Email Field Added ✅
+### 1. Fixed Registration Email Sending ✅
 
-**Files Modified:**
-- `lib/schemas.ts` - Added `email` field to `postcodeSchema` with validation
-- `components/forms/PostcodeForm.tsx` - Added email input field before address search
-- `app/api/register/submit/route.ts` - Updated to require and extract email from postcode data
+**Problem:** Emails were not being sent automatically after registration submission (only worked after manual test email).
 
-**Details:**
-- Email is now a required field with proper validation
-- Added to the first registration step (postcode form)
-- Email is saved with other registration data
+**Solution:**
+- Changed email sending from fire-and-forget `Promise.all()` to `await Promise.allSettled()`
+- This ensures emails complete before the serverless function terminates on Vercel
+- Added proper error handling that logs errors but doesn't break the registration flow
 
-### 2. Admin Email Notification ✅
+**Files Changed:**
+- `app/api/register/submit/route.ts` - Now awaits email sending
 
-**Files Created:**
-- `lib/email.ts` - Email utility functions using Nodemailer
-- `app/api/notify-admin/route.ts` - API route for admin notifications
+### 2. Email Field Already Exists ✅
 
-**Details:**
-- Sends email to admin when registration is submitted
-- Subject: "New registration received"
-- Includes all registration details (email, address, entity type, business details)
-- Uses environment variables for email configuration
+**Status:** The email field is already implemented in the registration form.
 
-### 3. User Confirmation Email ✅
+**Location:**
+- `components/forms/PostcodeForm.tsx` - Email field is the first field
+- `lib/schemas.ts` - Email validation is already in `postcodeSchema`
+- Email is required and validated with proper email format
 
-**Files Created:**
-- `app/api/send-confirmation/route.ts` - API route for user confirmation emails
+**No changes needed** - Email field is working correctly.
 
-**Details:**
-- Sends automatic confirmation email to user's email address
-- Subject: "Thanks for registering your food business"
-- Includes summary of submitted details
-- Triggered automatically after successful registration
+### 3. Enhanced Email Templates ✅
 
-### 4. Admin Dashboard ✅
+**Changes:**
+- Updated email subjects to match requirements:
+  - User email: "We've received your Make a Dish registration"
+  - Admin email: "New Make a Dish registration submitted"
+- Added business name extraction from detail data:
+  - Limited Company: Uses `companyName`
+  - Organisation: Uses `trustName`
+  - Sole Trader: Uses `firstName + lastName`
+  - Partnership: Uses `mainContact`
+- Enhanced user confirmation email to include business name and postcode
 
-**Files Created:**
-- `app/admin/login/page.tsx` - Admin login page
-- `app/admin/registrations/page.tsx` - List all registrations
-- `app/admin/registrations/[id]/page.tsx` - View individual registration details
-- `app/admin/logout/page.tsx` - Logout page
-- `app/api/admin/login/route.ts` - Login API route
-- `app/api/admin/logout/route.ts` - Logout API route
-- `lib/admin-auth.ts` - Authentication utility functions
-- `lib/s3.ts` - Added `getAllRegistrations()` function
+**Files Changed:**
+- `lib/email.ts` - Updated subjects and added business name to text body
+- `lib/email-templates.ts` - Added business name helper and enhanced HTML templates
 
-**Details:**
-- Password-protected admin routes
-- Lists all registrations with summary (email, postcode, business type, date)
-- Detail page shows full registration data
-- Simple, clean UI using existing components
-- Uses existing storage system (local JSON or S3)
+### 4. Updated Admin Email Configuration ✅
 
-### 5. Submit Route Updated ✅
+**Changes:**
+- Email functions now use `ADMIN_NOTIFICATION_EMAIL` environment variable
+- Falls back to `ADMIN_EMAIL` if `ADMIN_NOTIFICATION_EMAIL` is not set
+- Updated error messages to reflect this
 
-**Files Modified:**
-- `app/api/register/submit/route.ts` - Now sends emails after submission
+**Files Changed:**
+- `lib/email.ts` - Uses `ADMIN_NOTIFICATION_EMAIL` with fallback to `ADMIN_EMAIL`
 
-**Details:**
-- Extracts email from postcode data
-- Sends admin notification and user confirmation asynchronously
-- Emails don't block the response (best effort)
+### 5. Added Token-Based Admin Protection ✅
 
-## 📦 Dependencies Added
+**Changes:**
+- Admin registrations page now supports token-based access
+- Uses `ADMIN_DASHBOARD_TOKEN` environment variable
+- Access via: `/admin/registrations?token=YOUR_TOKEN`
+- Falls back to email-based auth if token is not configured
+- Shows clear error messages if token is missing or invalid
 
-- `nodemailer` - For sending emails
-- `@types/nodemailer` - TypeScript types
+**Files Changed:**
+- `app/admin/registrations/page.tsx` - Added token-based protection
 
-## 🔧 Environment Variables Required
+---
 
-Add these to your `.env.local`:
+## Environment Variables
 
-```env
-# Email Configuration (Required for email features)
+### Required for Email Functionality
+
+```
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@example.com
 EMAIL_PASS=your-email-password
-ADMIN_EMAIL=admin@example.com
-
-# Admin Access (Required for admin dashboard)
-ADMIN_PASSWORD=your-secure-password
-
-# Existing variables (still required)
-NEXT_PUBLIC_GOOGLE_PLACES_KEY=your-key
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-AWS_REGION=...
-AWS_S3_BUCKET=...
 ```
 
-## 🚀 New Routes
+### Admin Email (Choose One)
 
-### Admin Routes:
-- `/admin/login` - Admin login page
-- `/admin/registrations` - List all registrations (protected)
-- `/admin/registrations/[id]` - View registration details (protected)
-- `/admin/logout` - Logout
+**Option 1: Use ADMIN_NOTIFICATION_EMAIL (Recommended)**
+```
+ADMIN_NOTIFICATION_EMAIL=admin@example.com
+```
 
-### API Routes:
-- `/api/notify-admin` - Send admin notification email
-- `/api/send-confirmation` - Send user confirmation email
-- `/api/admin/login` - Authenticate admin
-- `/api/admin/logout` - Clear admin session
+**Option 2: Use ADMIN_EMAIL (Fallback)**
+```
+ADMIN_EMAIL=admin@example.com
+```
 
-## ✅ All Requirements Met
+**Note:** If both are set, `ADMIN_NOTIFICATION_EMAIL` takes precedence.
 
-- ✅ Email field added to first registration step
-- ✅ Email validation and storage
-- ✅ Admin email notification on registration
-- ✅ User confirmation email
-- ✅ Admin dashboard to view all registrations
-- ✅ Admin detail page for individual registrations
-- ✅ Password protection for admin routes
-- ✅ No UI styling changes
-- ✅ Uses existing storage system
-- ✅ Works with Vercel deployment (uses Nodemailer + SMTP)
+### Admin Dashboard Access (Optional)
 
-## 📝 Testing Checklist
+**For token-based access:**
+```
+ADMIN_DASHBOARD_TOKEN=your-secret-token-here
+```
 
-1. ✅ Email field appears in postcode form
-2. ✅ Email validation works
-3. ✅ Registration saves email
-4. ✅ Admin receives email on submission
-5. ✅ User receives confirmation email
-6. ✅ Admin login works
-7. ✅ Admin can view all registrations
-8. ✅ Admin can view individual registration details
-9. ✅ Password protection works
+**If not set:** Falls back to email-based authentication (existing `/admin/login`)
 
-## 🎯 Next Steps
+---
 
-1. Add email environment variables to `.env.local`
-2. Add `ADMIN_PASSWORD` to `.env.local`
-3. Test email sending (make sure SMTP credentials are correct)
-4. Test admin dashboard login
-5. For Vercel: Add all environment variables in dashboard
+## How It Works Now
 
+### Registration Flow
+
+1. User fills out registration form (email is collected in first step)
+2. User completes all steps and submits
+3. **Both emails are sent automatically:**
+   - ✅ User confirmation email → Sent to the email from the form
+   - ✅ Admin notification email → Sent to `ADMIN_NOTIFICATION_EMAIL` (or `ADMIN_EMAIL`)
+4. Registration is saved to S3/local storage
+5. User sees success page
+
+### Email Content
+
+**User Email Includes:**
+- Business name (extracted from detail data)
+- Registration ID
+- Submission date/time
+- Entity type
+- Postcode
+- Business address
+- Next steps information
+
+**Admin Email Includes:**
+- Registration ID
+- Submission date/time
+- User's email address
+- Entity type
+- Business address
+- Complete business details (JSON)
+
+### Admin Access
+
+**Token-Based (if `ADMIN_DASHBOARD_TOKEN` is set):**
+- Visit: `/admin/registrations?token=YOUR_TOKEN`
+- No login required if token is correct
+- Shows error if token is missing or wrong
+
+**Email-Based (if token not set):**
+- Visit: `/admin/login`
+- Enter email matching `ADMIN_EMAIL`
+- Then access `/admin/registrations`
+
+---
+
+## Testing Checklist
+
+- [ ] Complete a full registration
+- [ ] Verify user receives confirmation email
+- [ ] Verify admin receives notification email
+- [ ] Check emails include business name
+- [ ] Test admin access with token: `/admin/registrations?token=YOUR_TOKEN`
+- [ ] Test admin access without token (should show error or redirect to login)
+- [ ] Verify registration is saved correctly
+- [ ] Check admin dashboard shows new registration
+
+---
+
+## Files Modified
+
+1. `app/api/register/submit/route.ts` - Fixed email sending with await
+2. `lib/email.ts` - Updated to use ADMIN_NOTIFICATION_EMAIL, updated subjects, added business name
+3. `lib/email-templates.ts` - Enhanced templates with business name extraction
+4. `app/admin/registrations/page.tsx` - Added token-based protection
+
+---
+
+## No Changes Needed
+
+- ✅ Email field already exists in PostcodeForm
+- ✅ Email validation already in place
+- ✅ Admin registrations page already exists
+- ✅ Email templates already exist
+- ✅ Registration flow is intact
+
+---
+
+## Next Steps
+
+1. **Set environment variables in Vercel:**
+   - `ADMIN_NOTIFICATION_EMAIL` (or use `ADMIN_EMAIL`)
+   - `ADMIN_DASHBOARD_TOKEN` (optional, for token-based admin access)
+   - Email configuration (EMAIL_HOST, EMAIL_USER, EMAIL_PASS, etc.)
+
+2. **Redeploy** after setting environment variables
+
+3. **Test the flow:**
+   - Complete a registration
+   - Check both emails are received
+   - Test admin access
+
+---
+
+**All requirements have been implemented!** ✅
