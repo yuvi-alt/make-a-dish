@@ -40,7 +40,24 @@ function getClient() {
     throw new Error("AWS_REGION env var is required");
   }
 
-  client = new S3Client({ region });
+  // Explicitly use credentials from environment variables
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error(
+      "AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables are required"
+    );
+  }
+
+  client = new S3Client({
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
+  
   return client;
 }
 
@@ -134,14 +151,28 @@ export async function putStepData<T>(args: {
     return putLocal(args);
   }
 
-  const command = new PutObjectCommand({
-    Bucket: getBucket(),
-    Key: toKey(args.registrationId, args.step),
-    Body: JSON.stringify(args.data, null, 2),
-    ContentType: "application/json",
-  });
+  try {
+    const command = new PutObjectCommand({
+      Bucket: getBucket(),
+      Key: toKey(args.registrationId, args.step),
+      Body: JSON.stringify(args.data, null, 2),
+      ContentType: "application/json",
+    });
 
-  await getClient().send(command);
+    await getClient().send(command);
+  } catch (error) {
+    // Log detailed error for debugging
+    console.error("S3 PutObject error:", {
+      bucket: getBucket(),
+      key: toKey(args.registrationId, args.step),
+      region,
+      hasAccessKey: !!process.env.AWS_ACCESS_KEY_ID,
+      hasSecretKey: !!process.env.AWS_SECRET_ACCESS_KEY,
+      error: error instanceof Error ? error.message : String(error),
+      errorDetails: error,
+    });
+    throw error;
+  }
 }
 
 export async function getStepData<T>(args: {
