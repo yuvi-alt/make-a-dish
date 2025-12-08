@@ -12,7 +12,15 @@ import { STEP_FILE_KEYS, type StepFileKey } from "./steps";
 
 const bucket = process.env.AWS_S3_BUCKET;
 const region = process.env.AWS_REGION;
+const isVercel = Boolean(process.env.VERCEL);
 const useS3 = Boolean(bucket && region);
+
+// On Vercel, S3 is required (filesystem is read-only)
+if (isVercel && !useS3) {
+  console.error(
+    "⚠️ AWS S3 is required on Vercel. Please configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET environment variables."
+  );
+}
 
 let client: S3Client | null = null;
 
@@ -53,9 +61,37 @@ async function putLocal<T>({
   step: StepFileKey;
   data: T;
 }) {
+  // On Vercel, local storage doesn't work - require S3
+  if (isVercel) {
+    throw new Error(
+      "AWS S3 is required on Vercel. The filesystem is read-only. Please configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET environment variables in your Vercel project settings."
+    );
+  }
+
   const filePath = toLocalPath(registrationId, step);
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+  try {
+    await mkdir(path.dirname(filePath), { recursive: true });
+    await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+  } catch (error) {
+    // If we can't write to .data, try /tmp as fallback (for local dev)
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      ((error as { code?: string }).code === "EACCES" ||
+        (error as { code?: string }).code === "EROFS")
+    ) {
+      // Try using /tmp as fallback (only for local development)
+      if (!isVercel) {
+        const tmpBase = path.join("/tmp", REGISTRATION_PREFIX);
+        const tmpPath = path.join(tmpBase, registrationId, `${step}.json`);
+        await mkdir(path.dirname(tmpPath), { recursive: true });
+        await writeFile(tmpPath, JSON.stringify(data, null, 2), "utf8");
+        return;
+      }
+    }
+    throw error;
+  }
 }
 
 async function getLocal<T>({
@@ -87,6 +123,13 @@ export async function putStepData<T>(args: {
   step: StepFileKey;
   data: T;
 }) {
+  // On Vercel, S3 is mandatory
+  if (isVercel && !useS3) {
+    throw new Error(
+      "AWS S3 configuration is required on Vercel. Please add the following environment variables in Vercel: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET. See the setup guide for instructions."
+    );
+  }
+
   if (!useS3) {
     return putLocal(args);
   }
