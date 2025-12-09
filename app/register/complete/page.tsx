@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { FormShell } from "@/components/form-shell";
 
+// Force dynamic rendering to ensure fresh state
+export const dynamic = "force-dynamic";
+
 export default function CompletePage() {
   return (
     <FormShell

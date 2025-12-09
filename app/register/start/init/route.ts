@@ -12,12 +12,13 @@ const cookieSettings = {
 
 export async function GET(request: Request) {
   const cookieStore = await cookies();
-  const existing = cookieStore.get(REGISTRATION_COOKIE)?.value;
-
-  if (!existing) {
-    const newId = randomUUID();
-    cookieStore.set(REGISTRATION_COOKIE, newId, cookieSettings);
-  }
+  
+  // Clear any existing registration cookie to ensure fresh start
+  cookieStore.delete(REGISTRATION_COOKIE);
+  
+  // Create a new registration ID
+  const newId = randomUUID();
+  cookieStore.set(REGISTRATION_COOKIE, newId, cookieSettings);
 
   const url = new URL(request.url);
   url.pathname = "/register/start";

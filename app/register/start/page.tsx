@@ -4,6 +4,9 @@ import type { PostcodePayload } from "@/lib/schemas";
 import { ensureRegistrationId } from "@/lib/registration";
 import { getStepData } from "@/lib/s3";
 
+// Force dynamic rendering to prevent stale cache when "Start Again" is clicked
+export const dynamic = "force-dynamic";
+
 export default async function StartPage() {
   const registrationId = await ensureRegistrationId();
   const existing = await getStepData<PostcodePayload>({
