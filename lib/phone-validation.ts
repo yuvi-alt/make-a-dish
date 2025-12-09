@@ -112,9 +112,9 @@ export function formatToE164(phone: string | undefined): string {
     return `+44${stripped.substring(1)}`;
   }
 
-  // UK landline: 01/02/03xxxxxxxx → +441/2/3xxxxxxxx
+  // UK landline: 01/02/03xxxxxxxx → +441/2/3xxxxxxxx (remove leading 0)
   if ((stripped.startsWith("01") || stripped.startsWith("02") || stripped.startsWith("03")) && stripped.length >= 10) {
-    return `+44${stripped}`;
+    return `+44${stripped.substring(1)}`;
   }
 
   // If it starts with + but not +44, return as is

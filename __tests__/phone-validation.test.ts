@@ -57,19 +57,19 @@ describe("Phone Number Validation", () => {
       test("should accept +44 UK format", () => {
         const result = validatePhoneNumber("+447123456789");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(13);
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total digits
       });
 
       test("should accept +44 with spaces", () => {
         const result = validatePhoneNumber("+44 7123 456789");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(13);
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total digits
       });
 
       test("should accept other international formats", () => {
         const result = validatePhoneNumber("+1234567890");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
+        expect(result.digits).toBe(10); // +1 + 9 digits = 10 total digits
       });
     });
 
@@ -190,8 +190,9 @@ describe("Phone Number Validation", () => {
 
       test("should handle numbers starting with 0 but not UK format", () => {
         const result = formatToE164("012345678");
-        // Should attempt to format but validation will catch if invalid
-        expect(result).toContain("+44");
+        // Number is too short (< 10 digits), so formatting fails and returns original
+        // Validation will catch this as invalid
+        expect(result).toBe("012345678");
       });
     });
   });
@@ -216,7 +217,7 @@ describe("Phone Number Validation", () => {
     });
 
     test("should not count + sign", () => {
-      expect(countDigits("+447123456789")).toBe(13);
+      expect(countDigits("+447123456789")).toBe(12); // 12 digits (4+4+7+1+2+3+4+5+6+7+8+9)
     });
 
     test("should handle empty string", () => {
