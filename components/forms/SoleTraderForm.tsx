@@ -433,7 +433,7 @@ export function SoleTraderForm({
                     <Checkbox
                       id="tradingStatus"
                       checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      onChange={(e) => field.onChange(e.target.checked)}
                     />
                   </FormControl>
                   <FormLabel htmlFor="tradingStatus" className="!mt-0 cursor-pointer">
@@ -650,9 +650,9 @@ export function SoleTraderForm({
                       <FormControl>
                         <Checkbox
                           checked={field.value?.includes(option.value)}
-                          onCheckedChange={(checked) => {
+                          onChange={(e) => {
                             const currentValue = field.value || [];
-                            if (checked) {
+                            if (e.target.checked) {
                               field.onChange([...currentValue, option.value]);
                             } else {
                               field.onChange(currentValue.filter((v) => v !== option.value));
