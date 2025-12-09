@@ -21,14 +21,15 @@ const createPhoneSchema = (required: boolean = true, fieldName: string = "phone 
       });
   }
   
-  // Optional phone number - allow empty string, but validate if provided
+  // Optional phone number - allow empty string or "+44" (default), but validate if provided with digits
   return z
     .string()
     .trim()
     .optional()
     .or(z.literal(""))
+    .or(z.literal("+44"))
     .superRefine((value, ctx) => {
-      if (!value || value === "") return;
+      if (!value || value === "" || value === "+44") return;
       phoneNumberRefinement(value, ctx);
     });
 };

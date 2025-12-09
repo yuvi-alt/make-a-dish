@@ -10,6 +10,7 @@ import {
 } from "@/lib/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Select } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -45,15 +46,15 @@ export function SoleTraderForm({
       middleName: "",
       lastName: "",
       birthdate: "",
-      mainPhoneNumber: "",
-      secondaryPhoneNumber: "",
+      mainPhoneNumber: "+44",
+      secondaryPhoneNumber: "+44",
       emailAddress: "",
       postcode: "",
       tradingName: "",
       additionalTradingName: "",
       premisesType: "HOME_OR_DOMESTIC_PREMISES",
-      establishmentMainPhoneNumber: "",
-      establishmentSecondaryPhoneNumber: "",
+      establishmentMainPhoneNumber: "+44",
+      establishmentSecondaryPhoneNumber: "+44",
       establishmentEmailAddress: "",
       webAddress: "",
       tradingStatus: false,
@@ -78,7 +79,29 @@ export function SoleTraderForm({
 
   useEffect(() => {
     if (initialValues) {
-      form.reset(initialValues);
+      // Ensure phone numbers start with +44
+      const formattedInitials = {
+        ...initialValues,
+        mainPhoneNumber: initialValues.mainPhoneNumber?.startsWith("+44") 
+          ? initialValues.mainPhoneNumber 
+          : formatToE164(initialValues.mainPhoneNumber || ""),
+        secondaryPhoneNumber: initialValues.secondaryPhoneNumber && initialValues.secondaryPhoneNumber !== "+44"
+          ? (initialValues.secondaryPhoneNumber.startsWith("+44") 
+              ? initialValues.secondaryPhoneNumber 
+              : formatToE164(initialValues.secondaryPhoneNumber))
+          : "+44",
+        establishmentMainPhoneNumber: initialValues.establishmentMainPhoneNumber && initialValues.establishmentMainPhoneNumber !== "+44"
+          ? (initialValues.establishmentMainPhoneNumber.startsWith("+44") 
+              ? initialValues.establishmentMainPhoneNumber 
+              : formatToE164(initialValues.establishmentMainPhoneNumber))
+          : "+44",
+        establishmentSecondaryPhoneNumber: initialValues.establishmentSecondaryPhoneNumber && initialValues.establishmentSecondaryPhoneNumber !== "+44"
+          ? (initialValues.establishmentSecondaryPhoneNumber.startsWith("+44") 
+              ? initialValues.establishmentSecondaryPhoneNumber 
+              : formatToE164(initialValues.establishmentSecondaryPhoneNumber))
+          : "+44",
+      };
+      form.reset(formattedInitials);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValues]);
@@ -101,14 +124,8 @@ export function SoleTraderForm({
   const onSubmit = useCallback(async (values: SoleTraderPayload) => {
     setServerError(null);
     
-    // Format phone numbers to E.164 format
-    const formattedValues = {
-      ...values,
-      mainPhoneNumber: formatToE164(values.mainPhoneNumber),
-      secondaryPhoneNumber: values.secondaryPhoneNumber ? formatToE164(values.secondaryPhoneNumber) : values.secondaryPhoneNumber,
-      establishmentMainPhoneNumber: values.establishmentMainPhoneNumber ? formatToE164(values.establishmentMainPhoneNumber) : values.establishmentMainPhoneNumber,
-      establishmentSecondaryPhoneNumber: values.establishmentSecondaryPhoneNumber ? formatToE164(values.establishmentSecondaryPhoneNumber) : values.establishmentSecondaryPhoneNumber,
-    };
+    // Phone numbers are already in +44 format from PhoneInput component
+    const formattedValues = values;
     
     const response = await fetch("/api/register/step", {
       method: "POST",
@@ -225,12 +242,11 @@ export function SoleTraderForm({
               <FormItem>
                 <FormLabel htmlFor="mainPhoneNumber">Main Phone Number</FormLabel>
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="mainPhoneNumber"
-                    type="tel"
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                     aria-invalid={!!fieldState.error}
-                    placeholder="e.g. 07123456789"
                   />
                 </FormControl>
                 {fieldState.error ? (
@@ -247,12 +263,11 @@ export function SoleTraderForm({
               <FormItem>
                 <FormLabel htmlFor="secondaryPhoneNumber">Secondary Phone Number (optional)</FormLabel>
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="secondaryPhoneNumber"
-                    type="tel"
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                     aria-invalid={!!fieldState.error}
-                    placeholder="e.g. 07123456789"
                   />
                 </FormControl>
                 {fieldState.error ? (
@@ -373,12 +388,11 @@ export function SoleTraderForm({
               <FormItem>
                 <FormLabel htmlFor="establishmentMainPhoneNumber">Establishment Main Phone Number (optional)</FormLabel>
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="establishmentMainPhoneNumber"
-                    type="tel"
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                     aria-invalid={!!fieldState.error}
-                    placeholder="e.g. 07123456789"
                   />
                 </FormControl>
                 {fieldState.error ? (
@@ -395,12 +409,11 @@ export function SoleTraderForm({
               <FormItem>
                 <FormLabel htmlFor="establishmentSecondaryPhoneNumber">Establishment Secondary Phone Number (optional)</FormLabel>
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="establishmentSecondaryPhoneNumber"
-                    type="tel"
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                     aria-invalid={!!fieldState.error}
-                    placeholder="e.g. 07123456789"
                   />
                 </FormControl>
                 {fieldState.error ? (

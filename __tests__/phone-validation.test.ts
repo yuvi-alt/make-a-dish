@@ -7,69 +7,35 @@ import {
 
 describe("Phone Number Validation", () => {
   describe("validatePhoneNumber", () => {
-    describe("Valid UK Mobile Numbers", () => {
-      test("should accept 07xxxxxxxxx format (11 digits)", () => {
-        const result = validatePhoneNumber("07123456789");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-
-      test("should accept 07xxxxxxxxx with spaces", () => {
-        const result = validatePhoneNumber("07123 456789");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-
-      test("should accept 07xxxxxxxxx with hyphens", () => {
-        const result = validatePhoneNumber("07123-456-789");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-    });
-
-    describe("Valid UK Landline Numbers", () => {
-      test("should accept 01xxxxxxxx format", () => {
-        const result = validatePhoneNumber("0123456789");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(10);
-      });
-
-      test("should accept 02xxxxxxxx format", () => {
-        const result = validatePhoneNumber("02071234567");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-
-      test("should accept 03xxxxxxxx format", () => {
-        const result = validatePhoneNumber("03001234567");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-
-      test("should accept landline with spaces", () => {
-        const result = validatePhoneNumber("020 7123 4567");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
-      });
-    });
-
-    describe("Valid International Numbers", () => {
-      test("should accept +44 UK format", () => {
+    describe("Valid UK Numbers (must start with +44)", () => {
+      test("should accept +447xxxxxxxxx format (UK mobile)", () => {
         const result = validatePhoneNumber("+447123456789");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total digits
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total
       });
 
-      test("should accept +44 with spaces", () => {
-        const result = validatePhoneNumber("+44 7123 456789");
+      test("should accept +447xxxxxxxxxx format (11 digits after +44)", () => {
+        const result = validatePhoneNumber("+4471234567890");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total digits
+        expect(result.digits).toBe(13); // +44 + 11 digits = 13 total
       });
 
-      test("should accept other international formats", () => {
-        const result = validatePhoneNumber("+1234567890");
+      test("should accept +4420xxxxxxxx format (UK landline)", () => {
+        const result = validatePhoneNumber("+442071234567");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(10); // +1 + 9 digits = 10 total digits
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total
+      });
+
+      test("should accept +441xxxxxxxxx format (UK landline with 10 digits)", () => {
+        const result = validatePhoneNumber("+441234567890");
+        expect(result.valid).toBe(true);
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total
+      });
+
+      test("should accept +443xxxxxxxx format (UK landline)", () => {
+        const result = validatePhoneNumber("+443001234567");
+        expect(result.valid).toBe(true);
+        expect(result.digits).toBe(12); // +44 + 10 digits = 12 total
       });
     });
 
@@ -80,34 +46,46 @@ describe("Phone Number Validation", () => {
         expect(result.error).toBe("Enter a phone number");
       });
 
-      test("should reject too short numbers (< 10 digits)", () => {
-        const result = validatePhoneNumber("123456789");
+      test("should reject numbers not starting with +44", () => {
+        const result = validatePhoneNumber("07123456789");
+        expect(result.valid).toBe(false);
+        expect(result.error).toBe("Enter a valid UK phone number beginning with +44");
+      });
+
+      test("should reject +1 (US) format", () => {
+        const result = validatePhoneNumber("+1234567890");
+        expect(result.valid).toBe(false);
+        expect(result.error).toBe("Enter a valid UK phone number beginning with +44");
+      });
+
+      test("should reject +91 (India) format", () => {
+        const result = validatePhoneNumber("+911234567890");
+        expect(result.valid).toBe(false);
+        expect(result.error).toBe("Enter a valid UK phone number beginning with +44");
+      });
+
+      test("should reject too short numbers (< 10 digits after +44)", () => {
+        const result = validatePhoneNumber("+441234567");
         expect(result.valid).toBe(false);
         expect(result.error).toBe("Phone number is too short");
-        expect(result.digits).toBe(9);
+        expect(result.digits).toBe(9); // +44 (2) + 7 digits = 9 total
       });
 
-      test("should reject too long numbers (> 15 digits)", () => {
-        const result = validatePhoneNumber("1234567890123456");
+      test("should reject too long numbers (> 14 digits total)", () => {
+        const result = validatePhoneNumber("+441234567890123");
         expect(result.valid).toBe(false);
         expect(result.error).toBe("Phone number is too long");
-        expect(result.digits).toBe(16);
+        expect(result.digits).toBe(15); // +44 + 13 digits
       });
 
-      test("should reject numbers with letters", () => {
-        const result = validatePhoneNumber("07123abc456");
+      test("should reject numbers with non-digits after +44", () => {
+        const result = validatePhoneNumber("+447123 456789");
         expect(result.valid).toBe(false);
-        expect(result.error).toBe("Enter a valid phone number");
+        expect(result.error).toBe("Enter a valid UK phone number beginning with +44");
       });
 
-      test("should reject numbers with invalid symbols", () => {
-        const result = validatePhoneNumber("07123@456");
-        expect(result.valid).toBe(false);
-        expect(result.error).toBe("Enter a valid phone number");
-      });
-
-      test("should reject only plus sign", () => {
-        const result = validatePhoneNumber("+");
+      test("should reject only +44", () => {
+        const result = validatePhoneNumber("+44");
         expect(result.valid).toBe(false);
         expect(result.error).toBe("Phone number is too short");
       });
@@ -120,22 +98,22 @@ describe("Phone Number Validation", () => {
         expect(result.error).toBe("Enter a phone number");
       });
 
-      test("should handle numbers with parentheses", () => {
-        const result = validatePhoneNumber("(020) 7123 4567");
+      test("should handle minimum valid length (10 digits after +44)", () => {
+        const result = validatePhoneNumber("+441234567890");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(11);
+        expect(result.digits).toBe(12); // +44 + 10 digits
       });
 
-      test("should handle minimum valid length (10 digits)", () => {
-        const result = validatePhoneNumber("0123456789");
+      test("should handle maximum valid length (12 digits after +44 = 14 total)", () => {
+        const result = validatePhoneNumber("+44123456789012");
         expect(result.valid).toBe(true);
-        expect(result.digits).toBe(10);
+        expect(result.digits).toBe(14); // +44 + 12 digits
       });
 
-      test("should handle maximum valid length (15 digits)", () => {
-        const result = validatePhoneNumber("+123456789012345");
-        expect(result.valid).toBe(true);
-        expect(result.digits).toBe(15);
+      test("should reject exactly 15 digits total", () => {
+        const result = validatePhoneNumber("+441234567890123");
+        expect(result.valid).toBe(false);
+        expect(result.error).toBe("Phone number is too long");
       });
     });
   });
@@ -174,8 +152,12 @@ describe("Phone Number Validation", () => {
         expect(formatToE164("+447123456789")).toBe("+447123456789");
       });
 
-      test("should keep other international formats", () => {
-        expect(formatToE164("+1234567890")).toBe("+1234567890");
+      test("should convert +1 to +44 (UK-only)", () => {
+        expect(formatToE164("+1234567890")).toBe("+441234567890");
+      });
+
+      test("should convert +91 to +44 (UK-only)", () => {
+        expect(formatToE164("+911234567890")).toBe("+44911234567890");
       });
 
       test("should handle +44 with spaces", () => {
@@ -184,15 +166,14 @@ describe("Phone Number Validation", () => {
     });
 
     describe("Edge Cases", () => {
-      test("should return empty string for empty input", () => {
-        expect(formatToE164("")).toBe("");
+      test("should return +44 for empty input", () => {
+        expect(formatToE164("")).toBe("+44");
       });
 
       test("should handle numbers starting with 0 but not UK format", () => {
         const result = formatToE164("012345678");
-        // Number is too short (< 10 digits), so formatting fails and returns original
-        // Validation will catch this as invalid
-        expect(result).toBe("012345678");
+        // Number starts with 0, so remove leading 0 and add +44
+        expect(result).toBe("+4412345678");
       });
     });
   });
