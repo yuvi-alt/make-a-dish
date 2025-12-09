@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   soleTraderSchema,
@@ -24,6 +24,7 @@ import {
   FOOD_PROCESSING_METHODS_OPTIONS,
   WATER_SUPPLY_TYPE_OPTIONS,
 } from "@/lib/form-options";
+import { scrollToFirstError } from "@/lib/form-optimizations";
 
 type SoleTraderFormProps = {
   registrationId: string;
@@ -68,20 +69,35 @@ export function SoleTraderForm({
     },
   });
 
-  const tradingStatus = form.watch("tradingStatus");
+  // Use useWatch for better performance (only re-renders when this specific field changes)
+  const tradingStatus = useWatch({
+    control: form.control,
+    name: "tradingStatus",
+  });
 
   useEffect(() => {
     if (initialValues) {
       form.reset(initialValues);
     }
-  }, [initialValues, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValues]);
 
   const errorSummary = useMemo(
     () => buildErrorSummary(form.formState.errors),
     [form.formState.errors],
   );
 
-  const onSubmit = async (values: SoleTraderPayload) => {
+  // Scroll to first error when validation fails
+  useEffect(() => {
+    if (errorSummary.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        scrollToFirstError(form.formState.errors);
+      }, 100);
+    }
+  }, [errorSummary.length, form.formState.errors]);
+
+  const onSubmit = useCallback(async (values: SoleTraderPayload) => {
     setServerError(null);
     const response = await fetch("/api/register/step", {
       method: "POST",
@@ -96,18 +112,27 @@ export function SoleTraderForm({
     if (!response.ok) {
       const payload = await response.json().catch(() => null);
       setServerError(payload?.message ?? "Unable to save details.");
+      // Scroll to error banner
+      setTimeout(() => {
+        const errorBanner = document.querySelector('[role="alert"]') as HTMLElement;
+        if (errorBanner) {
+          errorBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
       return;
     }
 
     router.push("/register/review");
-  };
+  }, [registrationId, router]);
 
   return (
     <Form {...form}>
       <form
         className="space-y-8"
         noValidate
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, () => {
+          // Handle validation errors - scrollToFirstError is called in useEffect
+        })}
       >
         <ErrorSummary errors={errorSummary} />
         <FormErrorBanner message={serverError} />
