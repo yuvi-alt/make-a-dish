@@ -16,7 +16,9 @@ const createPhoneSchema = (required: boolean = true, fieldName: string = "phone 
       .string()
       .trim()
       .min(1, `Enter a ${fieldName}`)
-      .refine(phoneNumberRefinement);
+      .superRefine((value, ctx) => {
+        phoneNumberRefinement(value, ctx);
+      });
   }
   
   // Optional phone number - allow empty string, but validate if provided
