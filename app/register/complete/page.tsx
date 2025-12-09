@@ -16,7 +16,7 @@ export default function CompletePage() {
         <p className="text-lg">
           Want to start a new registration?{" "}
           <Link
-            href="/register/start"
+            href="/register/start/init"
             className="font-semibold text-brand-tangerine underline decoration-2 underline-offset-4"
           >
             Start again

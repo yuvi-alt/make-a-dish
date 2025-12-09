@@ -112,7 +112,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col gap-3">
             <Button asChild className="w-full md:w-auto">
-              <Link href="/register/start">Register your food business</Link>
+              <Link href="/register/start/init">Register your food business</Link>
             </Button>
             <Button asChild variant="secondary" className="w-full md:w-auto">
               <Link href="/about">Learn about the platform</Link>

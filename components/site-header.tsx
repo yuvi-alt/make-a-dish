@@ -52,7 +52,7 @@ export function SiteHeader() {
                        bg-gradient-to-r from-orange-400 to-orange-500
                        text-white shadow-md hover:brightness-110"
           >
-            <Link href="/register/start">
+            <Link href="/register/start/init">
               Register
             </Link>
           </Button>
