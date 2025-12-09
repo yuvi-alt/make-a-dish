@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { REGISTRATION_COOKIE } from "@/lib/constants";
 
+// Force dynamic rendering to prevent route caching
+export const dynamic = "force-dynamic";
+
 const cookieSettings = {
   httpOnly: true,
   sameSite: "lax" as const,
@@ -24,6 +27,13 @@ export async function GET(request: Request) {
   url.pathname = "/register/start";
   url.search = "";
 
-  return NextResponse.redirect(url);
+  const response = NextResponse.redirect(url);
+  
+  // Add cache control headers to prevent caching of redirect
+  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Expires", "0");
+  
+  return response;
 }
 

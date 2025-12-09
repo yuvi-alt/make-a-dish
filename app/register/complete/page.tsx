@@ -1,10 +1,16 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { FormShell } from "@/components/form-shell";
 
-// Force dynamic rendering to ensure fresh state
-export const dynamic = "force-dynamic";
-
 export default function CompletePage() {
+  const router = useRouter();
+
+  const handleStartAgain = () => {
+    // Force a full page reload to bypass Next.js client-side cache
+    window.location.href = "/register/start/init";
+  };
+
   return (
     <FormShell
       title="Registration submitted"
@@ -18,12 +24,12 @@ export default function CompletePage() {
         </p>
         <p className="text-lg">
           Want to start a new registration?{" "}
-          <Link
-            href="/register/start/init"
-            className="font-semibold text-brand-tangerine underline decoration-2 underline-offset-4"
+          <button
+            onClick={handleStartAgain}
+            className="font-semibold text-brand-tangerine underline decoration-2 underline-offset-4 cursor-pointer bg-transparent border-none p-0"
           >
             Start again
-          </Link>
+          </button>
           .
         </p>
       </div>
