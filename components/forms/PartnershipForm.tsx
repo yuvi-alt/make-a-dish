@@ -25,6 +25,7 @@ import {
   WATER_SUPPLY_TYPE_OPTIONS,
 } from "@/lib/form-options";
 import { scrollToFirstError } from "@/lib/form-optimizations";
+import { formatToE164 } from "@/lib/phone-validation";
 
 type PartnershipFormProps = {
   registrationId: string;
@@ -104,13 +105,23 @@ export function PartnershipForm({
 
   const onSubmit = useCallback(async (values: PartnershipPayload) => {
     setServerError(null);
+    
+    // Format phone numbers to E.164 format
+    const formattedValues = {
+      ...values,
+      mainPhoneNumber: formatToE164(values.mainPhoneNumber),
+      secondaryPhoneNumber: values.secondaryPhoneNumber ? formatToE164(values.secondaryPhoneNumber) : values.secondaryPhoneNumber,
+      establishmentMainPhoneNumber: values.establishmentMainPhoneNumber ? formatToE164(values.establishmentMainPhoneNumber) : values.establishmentMainPhoneNumber,
+      establishmentSecondaryPhoneNumber: values.establishmentSecondaryPhoneNumber ? formatToE164(values.establishmentSecondaryPhoneNumber) : values.establishmentSecondaryPhoneNumber,
+    };
+    
     const response = await fetch("/api/register/step", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         registrationId,
         step: "partnership",
-        data: values,
+        data: formattedValues,
       }),
     });
 

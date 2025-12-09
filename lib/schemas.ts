@@ -1,13 +1,35 @@
 import { z } from "zod";
 import { ENTITY_OPTIONS } from "./steps";
+import { phoneNumberRefinement } from "./phone-validation";
 
 const ukPostcodeRegex =
   /^([A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}|GIR ?0AA)$/i;
 
-const phoneRegex = /^[+()0-9\s-]{7,20}$/;
 const companiesHouseRegex = /^[A-Z0-9]{6,8}$/i;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const urlRegex = /^https?:\/\/.+/;
+
+// Phone number schema helper - validates phone numbers
+const createPhoneSchema = (required: boolean = true, fieldName: string = "phone number") => {
+  if (required) {
+    return z
+      .string()
+      .trim()
+      .min(1, `Enter a ${fieldName}`)
+      .refine(phoneNumberRefinement);
+  }
+  
+  // Optional phone number - allow empty string, but validate if provided
+  return z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .superRefine((value, ctx) => {
+      if (!value || value === "") return;
+      phoneNumberRefinement(value, ctx);
+    });
+};
 
 // Shared enums for dropdowns
 const premisesTypeEnum = z.enum([
@@ -89,15 +111,8 @@ export const soleTraderSchema = z.object({
     .string()
     .min(1, "Enter a date of birth")
     .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
-  mainPhoneNumber: z
-    .string()
-    .min(1, "Enter a main phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
-  secondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  mainPhoneNumber: createPhoneSchema(true, "main phone number"),
+  secondaryPhoneNumber: createPhoneSchema(false, "secondary phone number"),
   emailAddress: z
     .string()
     .trim()
@@ -113,16 +128,8 @@ export const soleTraderSchema = z.object({
   tradingName: z.string().min(1, "Enter a trading name"),
   additionalTradingName: z.string().optional().or(z.literal("")),
   premisesType: premisesTypeEnum,
-  establishmentMainPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
-  establishmentSecondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  establishmentMainPhoneNumber: createPhoneSchema(false, "establishment main phone number"),
+  establishmentSecondaryPhoneNumber: createPhoneSchema(false, "establishment secondary phone number"),
   establishmentEmailAddress: z
     .string()
     .trim()
@@ -207,15 +214,8 @@ export const partnershipSchema = z.object({
     .string()
     .min(1, "Enter a date of birth")
     .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
-  mainPhoneNumber: z
-    .string()
-    .min(1, "Enter a main phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
-  secondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  mainPhoneNumber: createPhoneSchema(true, "main phone number"),
+  secondaryPhoneNumber: createPhoneSchema(false, "secondary phone number"),
   emailAddress: z
     .string()
     .trim()
@@ -241,16 +241,8 @@ export const partnershipSchema = z.object({
   tradingName: z.string().min(1, "Enter a trading name"),
   additionalTradingName: z.string().optional().or(z.literal("")),
   premisesType: premisesTypeEnum,
-  establishmentMainPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
-  establishmentSecondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  establishmentMainPhoneNumber: createPhoneSchema(false, "establishment main phone number"),
+  establishmentSecondaryPhoneNumber: createPhoneSchema(false, "establishment secondary phone number"),
   establishmentEmailAddress: z
     .string()
     .trim()
@@ -344,15 +336,8 @@ export const limitedCompanySchema = z.object({
     .string()
     .min(1, "Enter a date of birth")
     .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
-  mainPhoneNumber: z
-    .string()
-    .min(1, "Enter a main phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
-  secondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  mainPhoneNumber: createPhoneSchema(true, "main phone number"),
+  secondaryPhoneNumber: createPhoneSchema(false, "secondary phone number"),
   emailAddress: z
     .string()
     .trim()
@@ -370,16 +355,8 @@ export const limitedCompanySchema = z.object({
   tradingName: z.string().min(1, "Enter a trading name"),
   additionalTradingName: z.string().optional().or(z.literal("")),
   premisesType: premisesTypeEnum,
-  establishmentMainPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
-  establishmentSecondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  establishmentMainPhoneNumber: createPhoneSchema(false, "establishment main phone number"),
+  establishmentSecondaryPhoneNumber: createPhoneSchema(false, "establishment secondary phone number"),
   establishmentEmailAddress: z
     .string()
     .trim()
@@ -466,15 +443,8 @@ export const organisationSchema = z.object({
     .string()
     .min(1, "Enter a date of birth")
     .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
-  mainPhoneNumber: z
-    .string()
-    .min(1, "Enter a main phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
-  secondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  mainPhoneNumber: createPhoneSchema(true, "main phone number"),
+  secondaryPhoneNumber: createPhoneSchema(false, "secondary phone number"),
   emailAddress: z
     .string()
     .trim()
@@ -490,16 +460,8 @@ export const organisationSchema = z.object({
   tradingName: z.string().min(1, "Enter a trading name"),
   additionalTradingName: z.string().optional().or(z.literal("")),
   premisesType: premisesTypeEnum,
-  establishmentMainPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
-  establishmentSecondaryPhoneNumber: z
-    .string()
-    .regex(phoneRegex, "Enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
+  establishmentMainPhoneNumber: createPhoneSchema(false, "establishment main phone number"),
+  establishmentSecondaryPhoneNumber: createPhoneSchema(false, "establishment secondary phone number"),
   establishmentEmailAddress: z
     .string()
     .trim()
