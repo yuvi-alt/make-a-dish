@@ -6,6 +6,59 @@ const ukPostcodeRegex =
 
 const phoneRegex = /^[+()0-9\s-]{7,20}$/;
 const companiesHouseRegex = /^[A-Z0-9]{6,8}$/i;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const urlRegex = /^https?:\/\/.+/;
+
+// Shared enums for dropdowns
+const premisesTypeEnum = z.enum([
+  "MOBILE_OR_MOVEABLE_PREMISES",
+  "HOME_OR_DOMESTIC_PREMISES",
+  "COMMERCIAL_OR_PUBLIC_PREMISES",
+]);
+
+const daysOfOperationEnum = z.enum([
+  "DAILY",
+  "PARTIAL_WEEK",
+  "SEASONAL",
+]);
+
+const businessTypeEnum = z.enum([
+  "LOCAL_CUSTOMERS",
+  "NATIONAL_CUSTOMERS",
+  "EXPORT_CUSTOMERS",
+  "ONLINE_SALES",
+  "B2B_SUPPLY",
+  "VULNERABLE_GROUPS",
+  "HEALTHCARE_RESIDENTS",
+  "NONE",
+  "UNKNOWN",
+]);
+
+const foodSupplyScopeEnum = z.enum([
+  "RAW_UNWRAPPED_PROTEINS",
+  "READY_TO_EAT",
+  "COOKED_REHEATED",
+  "IMPORTED_FOOD",
+  "NONE",
+  "UNKNOWN",
+]);
+
+const foodProcessingMethodsEnum = z.enum([
+  "VACUUM_PACKING",
+  "SOUS_VIDE",
+  "FERMENT_CURE",
+  "PASTEURISATION",
+  "RAW_ANIMAL_FOODS",
+  "REWRAP_RELABEL",
+  "NONE",
+  "UNKNOWN",
+]);
+
+const waterSupplyTypeEnum = z.enum([
+  "MAINS",
+  "PRIVATE",
+  "BOTH",
+]);
 
 export const postcodeSchema = z.object({
   email: z.string().trim().email("Enter a valid email address").min(1, "Enter an email address"),
@@ -28,25 +81,148 @@ export const entityTypeSchema = z.object({
 });
 
 export const soleTraderSchema = z.object({
+  // Person Fields
   firstName: z.string().min(1, "Enter a first name"),
-  middleName: z.string().optional(),
+  middleName: z.string().optional().or(z.literal("")),
   lastName: z.string().min(1, "Enter a last name"),
   birthdate: z
     .string()
     .min(1, "Enter a date of birth")
     .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
+  mainPhoneNumber: z
+    .string()
+    .min(1, "Enter a main phone number")
+    .regex(phoneRegex, "Enter a valid phone number"),
+  secondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  emailAddress: z
+    .string()
+    .trim()
+    .min(1, "Enter an email address")
+    .email("Enter a valid email address"),
+  
+  // Business Location Fields
   postcode: z
     .string()
     .trim()
     .regex(ukPostcodeRegex, "Enter a valid UK postcode")
     .transform((value) => value.toUpperCase().replace(/\s+/g, "")),
-  phoneNumber: z
+  tradingName: z.string().min(1, "Enter a trading name"),
+  additionalTradingName: z.string().optional().or(z.literal("")),
+  premisesType: premisesTypeEnum,
+  establishmentMainPhoneNumber: z
     .string()
-    .min(1, "Enter a phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentSecondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentEmailAddress: z
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .optional()
+    .or(z.literal("")),
+  webAddress: z
+    .string()
+    .trim()
+    .refine((value) => !value || value === "" || urlRegex.test(value), "Enter a valid web address (starting with http:// or https://)")
+    .optional()
+    .or(z.literal("")),
+  
+  // Trading Information
+  tradingStatus: z.boolean(),
+  tradingStartDate: z.string().optional().or(z.literal("")),
+  expectedOpeningDate: z.string().optional().or(z.literal("")),
+  
+  // Days of Operation
+  daysOfOperation: daysOfOperationEnum,
+  
+  // Operation Times
+  operationStartTime: z.string().min(1, "Enter an operation start time"),
+  operationEndTime: z.string().min(1, "Enter an operation end time"),
+  
+  // Business Type
+  businessType: businessTypeEnum,
+  
+  // Food Supply Scope
+  foodSupplyScope: foodSupplyScopeEnum,
+  
+  // Food Processing Methods (multi-select)
+  foodProcessingMethods: z.array(foodProcessingMethodsEnum).min(1, "Select at least one food processing method"),
+  
+  // Water Supply Type
+  waterSupplyType: waterSupplyTypeEnum,
+  
+  // Other Details
+  otherDetails: z.string().optional().or(z.literal("")),
+}).superRefine((data, ctx) => {
+  // Validate trading start date when trading status is Yes
+  if (data.tradingStatus) {
+    if (!data.tradingStartDate || data.tradingStartDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a trading start date",
+        path: ["tradingStartDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.tradingStartDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid trading start date",
+        path: ["tradingStartDate"],
+      });
+    }
+  }
+  
+  // Validate expected opening date when trading status is No
+  if (!data.tradingStatus) {
+    if (!data.expectedOpeningDate || data.expectedOpeningDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter an expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.expectedOpeningDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    }
+  }
 });
 
 export const partnershipSchema = z.object({
+  // Person Fields (for main contact)
+  firstName: z.string().min(1, "Enter a first name"),
+  middleName: z.string().optional().or(z.literal("")),
+  lastName: z.string().min(1, "Enter a last name"),
+  birthdate: z
+    .string()
+    .min(1, "Enter a date of birth")
+    .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
+  mainPhoneNumber: z
+    .string()
+    .min(1, "Enter a main phone number")
+    .regex(phoneRegex, "Enter a valid phone number"),
+  secondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  emailAddress: z
+    .string()
+    .trim()
+    .min(1, "Enter an email address")
+    .email("Enter a valid email address"),
+  
+  // Partners
   partners: z
     .array(
       z.object({
@@ -55,23 +231,101 @@ export const partnershipSchema = z.object({
     )
     .min(1, "Add at least one partner"),
   mainContact: z.string().min(1, "Enter a main point of contact"),
+  
+  // Business Location Fields
   postcode: z
     .string()
     .trim()
     .regex(ukPostcodeRegex, "Enter a valid UK postcode")
     .transform((value) => value.toUpperCase().replace(/\s+/g, "")),
-  mainPhone: z
-    .string()
-    .min(1, "Enter a phone number")
-    .regex(phoneRegex, "Enter a valid phone number"),
-  secondaryPhone: z
+  tradingName: z.string().min(1, "Enter a trading name"),
+  additionalTradingName: z.string().optional().or(z.literal("")),
+  premisesType: premisesTypeEnum,
+  establishmentMainPhoneNumber: z
     .string()
     .regex(phoneRegex, "Enter a valid phone number")
     .optional()
     .or(z.literal("")),
+  establishmentSecondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentEmailAddress: z
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .optional()
+    .or(z.literal("")),
+  webAddress: z
+    .string()
+    .trim()
+    .refine((value) => !value || value === "" || urlRegex.test(value), "Enter a valid web address (starting with http:// or https://)")
+    .optional()
+    .or(z.literal("")),
+  
+  // Trading Information
+  tradingStatus: z.boolean(),
+  tradingStartDate: z.string().optional().or(z.literal("")),
+  expectedOpeningDate: z.string().optional().or(z.literal("")),
+  
+  // Days of Operation
+  daysOfOperation: daysOfOperationEnum,
+  
+  // Operation Times
+  operationStartTime: z.string().min(1, "Enter an operation start time"),
+  operationEndTime: z.string().min(1, "Enter an operation end time"),
+  
+  // Business Type
+  businessType: businessTypeEnum,
+  
+  // Food Supply Scope
+  foodSupplyScope: foodSupplyScopeEnum,
+  
+  // Food Processing Methods (multi-select)
+  foodProcessingMethods: z.array(foodProcessingMethodsEnum).min(1, "Select at least one food processing method"),
+  
+  // Water Supply Type
+  waterSupplyType: waterSupplyTypeEnum,
+  
+  // Other Details
+  otherDetails: z.string().optional().or(z.literal("")),
+}).superRefine((data, ctx) => {
+  if (data.tradingStatus) {
+    if (!data.tradingStartDate || data.tradingStartDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a trading start date",
+        path: ["tradingStartDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.tradingStartDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid trading start date",
+        path: ["tradingStartDate"],
+      });
+    }
+  }
+  
+  if (!data.tradingStatus) {
+    if (!data.expectedOpeningDate || data.expectedOpeningDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter an expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.expectedOpeningDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    }
+  }
 });
 
 export const limitedCompanySchema = z.object({
+  // Company Fields
   companyName: z.string().min(1, "Enter the registered company name"),
   companiesHouseNumber: z
     .string()
@@ -81,17 +335,242 @@ export const limitedCompanySchema = z.object({
       "Companies House number should be 6-8 letters/numbers",
     )
     .transform((value) => value.toUpperCase()),
-  contactName: z.string().min(1, "Enter a contact name"),
-  role: z.string().optional(),
-  phoneNumber: z
+  
+  // Person Fields (for contact)
+  firstName: z.string().min(1, "Enter a first name"),
+  middleName: z.string().optional().or(z.literal("")),
+  lastName: z.string().min(1, "Enter a last name"),
+  birthdate: z
     .string()
-    .min(1, "Enter a phone number")
+    .min(1, "Enter a date of birth")
+    .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
+  mainPhoneNumber: z
+    .string()
+    .min(1, "Enter a main phone number")
     .regex(phoneRegex, "Enter a valid phone number"),
+  secondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  emailAddress: z
+    .string()
+    .trim()
+    .min(1, "Enter an email address")
+    .email("Enter a valid email address"),
+  contactName: z.string().min(1, "Enter a contact name"),
+  role: z.string().optional().or(z.literal("")),
+  
+  // Business Location Fields
+  postcode: z
+    .string()
+    .trim()
+    .regex(ukPostcodeRegex, "Enter a valid UK postcode")
+    .transform((value) => value.toUpperCase().replace(/\s+/g, "")),
+  tradingName: z.string().min(1, "Enter a trading name"),
+  additionalTradingName: z.string().optional().or(z.literal("")),
+  premisesType: premisesTypeEnum,
+  establishmentMainPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentSecondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentEmailAddress: z
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .optional()
+    .or(z.literal("")),
+  webAddress: z
+    .string()
+    .trim()
+    .refine((value) => !value || value === "" || urlRegex.test(value), "Enter a valid web address (starting with http:// or https://)")
+    .optional()
+    .or(z.literal("")),
+  
+  // Trading Information
+  tradingStatus: z.boolean(),
+  tradingStartDate: z.string().optional().or(z.literal("")),
+  expectedOpeningDate: z.string().optional().or(z.literal("")),
+  
+  // Days of Operation
+  daysOfOperation: daysOfOperationEnum,
+  
+  // Operation Times
+  operationStartTime: z.string().min(1, "Enter an operation start time"),
+  operationEndTime: z.string().min(1, "Enter an operation end time"),
+  
+  // Business Type
+  businessType: businessTypeEnum,
+  
+  // Food Supply Scope
+  foodSupplyScope: foodSupplyScopeEnum,
+  
+  // Food Processing Methods (multi-select)
+  foodProcessingMethods: z.array(foodProcessingMethodsEnum).min(1, "Select at least one food processing method"),
+  
+  // Water Supply Type
+  waterSupplyType: waterSupplyTypeEnum,
+  
+  // Other Details
+  otherDetails: z.string().optional().or(z.literal("")),
+}).superRefine((data, ctx) => {
+  if (data.tradingStatus) {
+    if (!data.tradingStartDate || data.tradingStartDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a trading start date",
+        path: ["tradingStartDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.tradingStartDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid trading start date",
+        path: ["tradingStartDate"],
+      });
+    }
+  }
+  
+  if (!data.tradingStatus) {
+    if (!data.expectedOpeningDate || data.expectedOpeningDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter an expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.expectedOpeningDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    }
+  }
 });
 
 export const organisationSchema = z.object({
+  // Organisation Fields
   trustName: z.string().min(1, "Enter the organisation name"),
-  charityReferenceNumber: z.string().optional(),
+  charityReferenceNumber: z.string().optional().or(z.literal("")),
+  
+  // Person Fields (for main contact)
+  firstName: z.string().min(1, "Enter a first name"),
+  middleName: z.string().optional().or(z.literal("")),
+  lastName: z.string().min(1, "Enter a last name"),
+  birthdate: z
+    .string()
+    .min(1, "Enter a date of birth")
+    .refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid date"),
+  mainPhoneNumber: z
+    .string()
+    .min(1, "Enter a main phone number")
+    .regex(phoneRegex, "Enter a valid phone number"),
+  secondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  emailAddress: z
+    .string()
+    .trim()
+    .min(1, "Enter an email address")
+    .email("Enter a valid email address"),
+  
+  // Business Location Fields
+  postcode: z
+    .string()
+    .trim()
+    .regex(ukPostcodeRegex, "Enter a valid UK postcode")
+    .transform((value) => value.toUpperCase().replace(/\s+/g, "")),
+  tradingName: z.string().min(1, "Enter a trading name"),
+  additionalTradingName: z.string().optional().or(z.literal("")),
+  premisesType: premisesTypeEnum,
+  establishmentMainPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentSecondaryPhoneNumber: z
+    .string()
+    .regex(phoneRegex, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  establishmentEmailAddress: z
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .optional()
+    .or(z.literal("")),
+  webAddress: z
+    .string()
+    .trim()
+    .refine((value) => !value || value === "" || urlRegex.test(value), "Enter a valid web address (starting with http:// or https://)")
+    .optional()
+    .or(z.literal("")),
+  
+  // Trading Information
+  tradingStatus: z.boolean(),
+  tradingStartDate: z.string().optional().or(z.literal("")),
+  expectedOpeningDate: z.string().optional().or(z.literal("")),
+  
+  // Days of Operation
+  daysOfOperation: daysOfOperationEnum,
+  
+  // Operation Times
+  operationStartTime: z.string().min(1, "Enter an operation start time"),
+  operationEndTime: z.string().min(1, "Enter an operation end time"),
+  
+  // Business Type
+  businessType: businessTypeEnum,
+  
+  // Food Supply Scope
+  foodSupplyScope: foodSupplyScopeEnum,
+  
+  // Food Processing Methods (multi-select)
+  foodProcessingMethods: z.array(foodProcessingMethodsEnum).min(1, "Select at least one food processing method"),
+  
+  // Water Supply Type
+  waterSupplyType: waterSupplyTypeEnum,
+  
+  // Other Details
+  otherDetails: z.string().optional().or(z.literal("")),
+}).superRefine((data, ctx) => {
+  if (data.tradingStatus) {
+    if (!data.tradingStartDate || data.tradingStartDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a trading start date",
+        path: ["tradingStartDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.tradingStartDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid trading start date",
+        path: ["tradingStartDate"],
+      });
+    }
+  }
+  
+  if (!data.tradingStatus) {
+    if (!data.expectedOpeningDate || data.expectedOpeningDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter an expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    } else if (Number.isNaN(Date.parse(data.expectedOpeningDate))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Enter a valid expected opening date",
+        path: ["expectedOpeningDate"],
+      });
+    }
+  }
 });
 
 export type PostcodePayload = z.infer<typeof postcodeSchema>;
