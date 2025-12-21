@@ -19,7 +19,7 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "mx-auto grid max-w-5xl gap-8 rounded-[32px] bg-white/80 px-8 py-12 text-brand-charcoal shadow-brand-soft backdrop-blur",
+        "mx-auto grid max-w-7xl gap-8 px-4 py-12 text-brand-charcoal md:px-8",
         className,
       )}
     >

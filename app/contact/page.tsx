@@ -33,7 +33,7 @@ export default function ContactPage() {
         description="Send us a note and our operator success team will get back within 24 hours. Prefer WhatsApp or a call? Let us know in the message."
       />
 
-      <section className="mx-auto grid max-w-5xl gap-8 px-6 md:grid-cols-2">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 md:grid-cols-2 md:px-8">
         <ContactForm />
         <div className="glass-surface space-y-5 p-6">
           <h3 className="text-2xl font-semibold text-brand-charcoal">

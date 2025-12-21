@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroBanner() {
   return (
-    <section className="relative mx-auto grid max-w-6xl gap-10 px-6 pt-10 pb-16 lg:grid-cols-2 lg:items-center">
+    <section className="relative mx-auto grid max-w-7xl gap-10 px-4 pt-10 pb-16 lg:grid-cols-2 lg:items-center md:px-8">
       <div className="space-y-6">
         <p className="inline-flex items-center gap-2 rounded-full bg-brand-butter/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-brand-charcoal/70">
           Warm, local & independent
@@ -28,7 +28,7 @@ export function HeroBanner() {
             <Link href="/how-it-works">See how it works</Link>
           </Button>
         </div>
-        <div className="space-y-2 rounded-3xl border border-white/60 bg-white/80 p-6 shadow-brand-soft backdrop-blur">
+        <div className="space-y-2 rounded-3xl border border-gray-100 bg-white p-6 shadow-brand-soft">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-charcoal/60">
             Why chefs choose Make a Dish
           </p>
@@ -62,7 +62,7 @@ export function HeroBanner() {
                 "Upload seasonal menus in minutes",
                 "Give neighbours an easy way to order locally",
               ].map((item) => (
-                <p key={item} className="rounded-2xl bg-white/80 px-4 py-3 text-base shadow-brand-soft">
+                <p key={item} className="rounded-2xl bg-white px-4 py-3 text-base shadow-brand-soft border border-gray-100">
                   {item}
                 </p>
               ))}

@@ -15,8 +15,8 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="w-full border-b border-[#F1E9DD] bg-[#FCF9F4]/80 backdrop-blur-lg">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="w-full border-b border-gray-200 bg-brand-warm-white">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
 
         {/* LOGO */}
         <Link

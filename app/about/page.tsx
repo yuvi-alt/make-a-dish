@@ -97,8 +97,8 @@ export default function AboutPage() {
         <Testimonials />
       </MarketingSection>
 
-      <section className="mx-auto max-w-5xl px-6 py-16">
-        <div className="glass-surface flex flex-col gap-6 overflow-hidden bg-gradient-to-br from-brand-butter/70 to-brand-peach/60 p-8 text-brand-charcoal md:flex-row md:items-center md:justify-between">
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+        <div className="glass-surface flex flex-col gap-6 overflow-hidden p-8 text-brand-charcoal md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-charcoal/70">
               Bring your recipes to the block

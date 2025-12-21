@@ -12,7 +12,7 @@ type ReviewCardProps = {
 export function ReviewCard({ title, items, changeHref }: ReviewCardProps) {
   return (
     <section className="rounded-3xl border border-gray-100 bg-white shadow-brand-soft">
-      <header className="flex items-center justify-between gap-3 border-b border-gray-100 bg-gray-50 px-6 py-4">
+      <header className="flex items-center justify-between gap-3 border-b border-gray-100 bg-white px-6 py-4">
         <h3 className="text-xl font-semibold text-brand-charcoal">{title}</h3>
         {changeHref ? (
           <a

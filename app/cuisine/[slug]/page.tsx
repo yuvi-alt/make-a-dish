@@ -75,7 +75,7 @@ export default async function CuisinePage({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
       <div className="mb-8">
         <Button asChild variant="secondary" className="mb-6">
           <Link href="/" className="inline-flex items-center gap-2">

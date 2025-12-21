@@ -103,7 +103,7 @@ export default function HomePage() {
   return (
     <div className="space-y-12 pb-12">
       {/* Hero Section */}
-      <section className="mx-auto max-w-6xl px-6 pt-8 pb-12">
+      <section className="mx-auto max-w-7xl px-4 pt-8 pb-12 md:px-8">
         <div className="mx-auto max-w-3xl text-center space-y-4">
           <h1 className="font-display text-4xl font-semibold leading-tight text-brand-charcoal md:text-5xl lg:text-6xl">
             Discover homemade food in your neighbourhood
@@ -127,7 +127,7 @@ export default function HomePage() {
       </section>
 
       {/* Popular Cuisines Section */}
-      <section className="mx-auto max-w-6xl px-6">
+      <section className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="space-y-6">
           <div>
             <h2 className="font-display text-3xl font-semibold text-brand-charcoal md:text-4xl">
@@ -152,7 +152,7 @@ export default function HomePage() {
       </section>
 
       {/* Trending Section */}
-      <section className="mx-auto max-w-6xl px-6">
+      <section className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="space-y-6">
           <div>
             <h2 className="font-display text-3xl font-semibold text-brand-charcoal md:text-4xl">

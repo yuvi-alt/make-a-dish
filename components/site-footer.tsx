@@ -10,8 +10,8 @@ const footerLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/60 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 text-sm text-brand-charcoal/70 md:flex-row md:items-center md:justify-between">
+    <footer className="border-t border-gray-200 bg-brand-warm-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 text-sm text-brand-charcoal/70 md:flex-row md:items-center md:justify-between md:px-8">
         <div>
           <p className="font-display text-xl font-semibold text-brand-charcoal">
             Make a Dish

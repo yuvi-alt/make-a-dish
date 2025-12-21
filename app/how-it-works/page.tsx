@@ -64,7 +64,7 @@ export default function HowItWorksPage() {
         heading="What happens behind the scenes"
         description="While you focus on flavour, we take care of the paperwork, guidance, and merchandising."
       >
-        <div className="rounded-[32px] bg-white/80 p-8 shadow-brand-soft">
+        <div className="rounded-[32px] bg-white p-8 shadow-brand-soft border border-gray-100">
           <ul className="space-y-4 text-brand-charcoal/80">
             <li>
               <strong className="text-brand-charcoal">Smart compliance:</strong> automated
