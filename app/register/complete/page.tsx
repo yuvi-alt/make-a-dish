@@ -13,14 +13,13 @@ export default function CompletePage() {
 
   return (
     <FormShell
-      title="Registration submitted"
+      title="Registration successful — please log in to publish your dishes."
       description="We have sent your details to the local authority. They will be in touch if they need more information."
       currentStep="complete"
     >
       <div className="space-y-4">
         <p className="text-lg">
-          A confirmation email will arrive shortly. You only need to register a
-          food business once, unless any of your details change.
+          A confirmation email will arrive shortly. Once you log in, you can start publishing your dishes and connecting with customers.
         </p>
         <p className="text-lg">
           Want to start a new registration?{" "}
