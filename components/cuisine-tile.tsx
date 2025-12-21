@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type CuisineTileProps = {
@@ -6,6 +7,7 @@ type CuisineTileProps = {
   slug: string;
   description?: string;
   gradient?: string;
+  imageSrc?: string;
 };
 
 const defaultGradients = [
@@ -21,7 +23,7 @@ const defaultGradients = [
   "from-amber-200 to-amber-300",
 ];
 
-export function CuisineTile({ name, slug, description, gradient }: CuisineTileProps) {
+export function CuisineTile({ name, slug, description, gradient, imageSrc }: CuisineTileProps) {
   const tileGradient = gradient || defaultGradients[slug.length % defaultGradients.length];
 
   return (
@@ -36,8 +38,19 @@ export function CuisineTile({ name, slug, description, gradient }: CuisineTilePr
           "h-full flex flex-col"
         )}
       >
-        <div className={cn("h-40 w-full bg-gradient-to-br", tileGradient)}>
-          {/* Image placeholder area */}
+        {/* Fixed height container for image or gradient placeholder */}
+        <div className="relative h-40 w-full overflow-hidden rounded-t-2xl">
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          ) : (
+            <div className={cn("h-full w-full bg-gradient-to-br", tileGradient)} />
+          )}
         </div>
         <div className="p-4 flex-1 flex flex-col">
           <h3 className="text-lg font-semibold text-brand-charcoal group-hover:text-brand-tangerine transition-colors">
@@ -51,4 +64,3 @@ export function CuisineTile({ name, slug, description, gradient }: CuisineTilePr
     </Link>
   );
 }
-

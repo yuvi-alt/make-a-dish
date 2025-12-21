@@ -15,24 +15,28 @@ const popularCuisines = [
     slug: "indian",
     description: "Popular in your area",
     gradient: "from-orange-200 via-orange-100 to-amber-100",
+    imageSrc: "/cuisines/indian.jpg",
   },
   {
     name: "Italian",
     slug: "italian",
     description: "Popular in your area",
     gradient: "from-red-200 via-red-100 to-pink-100",
+    imageSrc: "/cuisines/italian.jpg",
   },
   {
     name: "Modern British",
     slug: "british",
     description: "Popular in your area",
     gradient: "from-blue-200 via-blue-100 to-indigo-100",
+    imageSrc: "/cuisines/british.jpg",
   },
   {
     name: "Chinese",
     slug: "chinese",
     description: "Popular in your area",
     gradient: "from-yellow-200 via-yellow-100 to-amber-100",
+    imageSrc: "/cuisines/chinese.jpg",
   },
   {
     name: "Thai",
@@ -145,6 +149,7 @@ export default function HomePage() {
                 slug={cuisine.slug}
                 description={cuisine.description}
                 gradient={cuisine.gradient}
+                imageSrc={cuisine.imageSrc}
               />
             ))}
           </div>
