@@ -9,12 +9,12 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: #FAF7F2;
+  background-color: #FFFFFF;
 }
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
-  background-color: #FAF7F2;
+  background-color: #FFFFFF;
   color: #2b1a14;
   min-height: 100vh;
 }

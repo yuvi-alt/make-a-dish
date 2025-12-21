@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="bg-brand-warm-white text-brand-charcoal antialiased">
+      <body className="bg-white text-brand-charcoal antialiased">
         <div className="relative flex min-h-screen flex-col">
           <SiteHeader />
           <main className="flex-1 pt-24 pb-16">{children}</main>
