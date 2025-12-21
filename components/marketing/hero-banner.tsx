@@ -20,7 +20,7 @@ export function HeroBanner() {
         <div className="flex flex-wrap gap-3">
           <Button asChild>
             <Link href="/register/start/init" className="inline-flex items-center gap-2">
-              Register your food business
+              Become a Host
               <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>

@@ -1,102 +1,125 @@
-import { Heart, Globe2, Award, Users } from "lucide-react";
-import { PageHero } from "@/components/marketing/page-hero";
+import Link from "next/link";
+import {
+  ChefHat,
+  Upload,
+  Users,
+  ShieldCheck,
+  Smartphone,
+  Leaf,
+  Sparkles,
+} from "lucide-react";
+import { HeroBanner } from "@/components/marketing/hero-banner";
 import { MarketingSection, InfoCard } from "@/components/marketing/section";
+import { Testimonials } from "@/components/marketing/testimonials";
+import { Button } from "@/components/ui/button";
 
-const values = [
+const steps = [
   {
-    title: "Empower home chefs",
-    description: "Give cooks the tools to run a compliant, beautiful business from their own kitchen.",
-    icon: Heart,
+    title: "Become a Host",
+    description:
+      "Answer friendly, guided questions so local authorities receive everything they need the first time.",
+    icon: ChefHat,
     accent: "peach" as const,
   },
   {
-    title: "Celebrate every culture",
-    description: "Dishes from every part of the world deserve the same spotlight as restaurant brands.",
-    icon: Globe2,
+    title: "Upload your dishes",
+    description:
+      "Snap your menu, add ingredients, and schedule the nights you're cooking. It feels like publishing to a marketplace.",
+    icon: Upload,
     accent: "cream" as const,
   },
   {
-    title: "Build trust with councils",
-    description: "We work closely with UK authorities to keep guidance current and approvals fast.",
-    icon: Award,
+    title: "Local people discover & order",
+    description:
+      "Customers nearby see your story, favourite dishes, and delivery radius. You focus on flavour—we handle the rest.",
+    icon: Users,
     accent: "green" as const,
   },
 ];
 
-const stats = [
-  { label: "Cities supported", value: "52" },
-  { label: "Average approval time", value: "6 days" },
-  { label: "Community members", value: "34k" },
-  { label: "Active local partners", value: "120+" },
+const benefits = [
+  {
+    title: "Guided compliance",
+    description: "Automatic reminders, document templates, and secure storage for certificates.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Mobile-first dashboard",
+    description: "Manage orders, menu, and availability from your phone while you prep.",
+    icon: Smartphone,
+  },
+  {
+    title: "Fresh & sustainable",
+    description: "Encourage seasonal produce with prompts, badges, and local supplier tips.",
+    icon: Leaf,
+  },
+  {
+    title: "Delightful storytelling",
+    description: "Showcase your origin story, cooking style, and kitchen vibes with rich profiles.",
+    icon: Sparkles,
+  },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="space-y-14">
-      <PageHero
-        eyebrow="About Make a Dish"
-        title="The marketplace built specifically for home food businesses"
-        description="Make a Dish was created by former Deliveroo product leads and council compliance officers who wanted a friendlier path for independent cooks. We provide the structure of a delivery app with the warmth of a neighbourhood market."
-      />
-
+    <div className="space-y-6">
+      <HeroBanner />
       <MarketingSection
-        eyebrow="Vision"
-        heading="Warm technology that works for small kitchens"
-        description="We believe independent cooks should have the same design quality, ordering experience, and operational tooling as big brands—without the fees."
+        id="how-it-works"
+        eyebrow="How it works"
+        heading="A three-step launch, inspired by food delivery apps"
+        description="Everything feels familiar, intuitive, and friendly—so you can move from idea to first order in days, not months."
       >
         <div className="grid gap-6 md:grid-cols-3">
-          {values.map((value) => (
-            <InfoCard key={value.title} {...value} />
+          {steps.map((step) => (
+            <InfoCard key={step.title} {...step} />
           ))}
         </div>
       </MarketingSection>
 
       <MarketingSection
-        eyebrow="Community impact"
-        heading="What makes Make a Dish different"
-        description="We invest in chef education, transparent compliance, and local partnerships so you can focus on flavour."
+        eyebrow="Loved by chefs & councils"
+        heading="Why food entrepreneurs choose Make a Dish"
+        description="The platform pairs warm aesthetics with rock-solid compliance, making it easy for regulators to approve and locals to trust."
       >
-        <div className="rounded-[32px] bg-white/80 p-8 shadow-brand-soft">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <h3 className="text-2xl font-semibold text-brand-charcoal">
-                Built with and for operators
-              </h3>
-              <p className="text-brand-charcoal/80">
-                Our advisory board features experienced council inspectors, seasoned
-                street food entrepreneurs, and accessibility specialists. Every screen is
-                tested with real cooks before launch.
-              </p>
-            </div>
-            <div className="space-y-4 rounded-3xl bg-brand-cream/70 p-6">
-              <div className="flex items-center gap-3 text-brand-charcoal">
-                <Users className="h-10 w-10 rounded-2xl bg-brand-butter p-2" />
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-charcoal/70">
-                    Community
-                  </p>
-                  <p className="text-2xl font-display font-semibold">Chef circles</p>
-                </div>
-              </div>
-              <p className="text-brand-charcoal/75">
-                Monthly peer sessions covering menu pricing, allergen training, and local
-                marketing ideas.
-              </p>
-            </div>
-          </div>
-          <div className="mt-8 grid gap-4 rounded-3xl bg-brand-butter/50 p-6 md:grid-cols-4">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <p className="text-3xl font-display font-semibold text-brand-charcoal">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-brand-charcoal/70">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {benefits.map((benefit) => (
+            <InfoCard key={benefit.title} icon={benefit.icon} title={benefit.title} description={benefit.description} />
+          ))}
         </div>
       </MarketingSection>
+
+      <MarketingSection
+        eyebrow="Proof"
+        heading="Testimonials from the community"
+        description="Real chefs, bakers, and inspectors who rely on Make a Dish every week."
+      >
+        <Testimonials />
+      </MarketingSection>
+
+      <section className="mx-auto max-w-5xl px-6 py-16">
+        <div className="glass-surface flex flex-col gap-6 overflow-hidden bg-gradient-to-br from-brand-butter/70 to-brand-peach/60 p-8 text-brand-charcoal md:flex-row md:items-center md:justify-between">
+          <div className="max-w-xl space-y-3">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-charcoal/70">
+              Bring your recipes to the block
+            </p>
+            <h3 className="font-display text-3xl font-semibold">
+              Ready to share your signature dishes?
+            </h3>
+            <p className="text-base text-brand-charcoal/80">
+              Start your registration today and join thousands of home chefs turning passion into income.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Button asChild className="w-full md:w-auto">
+              <Link href="/register/start/init">Become a Host</Link>
+            </Button>
+            <Button asChild variant="secondary" className="w-full md:w-auto">
+              <Link href="/about">Learn about the platform</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-

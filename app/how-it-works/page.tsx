@@ -4,7 +4,7 @@ import { MarketingSection, InfoCard } from "@/components/marketing/section";
 
 const processSteps = [
   {
-    title: "Register",
+    title: "Become a Host",
     description:
       "Tell us about your kitchen, menu, and hygiene processes. We package the data for your local authority.",
     icon: ClipboardCheck,

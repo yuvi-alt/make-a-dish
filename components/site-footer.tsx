@@ -5,12 +5,12 @@ const footerLinks = [
   { label: "About", href: "/about" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Contact", href: "/contact" },
-  { label: "Start registration", href: "/register/start/init" },
+  { label: "Become a Host", href: "/register/start/init" },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/60 bg-brand-cream/80">
+    <footer className="border-t border-white/60 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 text-sm text-brand-charcoal/70 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="font-display text-xl font-semibold text-brand-charcoal">

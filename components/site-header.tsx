@@ -53,7 +53,7 @@ export function SiteHeader() {
                        text-white shadow-md hover:brightness-110"
           >
             <Link href="/register/start/init">
-              Register
+              Become a Host
             </Link>
           </Button>
         </div>
