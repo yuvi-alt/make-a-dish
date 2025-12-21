@@ -48,7 +48,7 @@ export function SiteHeader() {
           <Button
             asChild
             variant="primary"
-            className="px-5 py-2 rounded-full font-medium
+            className="px-8 py-3 rounded-full text-base font-semibold
                        bg-gradient-to-r from-orange-400 to-orange-500
                        text-white shadow-md hover:brightness-110"
           >
