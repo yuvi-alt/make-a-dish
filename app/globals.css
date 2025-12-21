@@ -13,7 +13,7 @@ html {
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
-  background-color: #ffffff;
+  background-color: #FAF7F2;
   color: #2b1a14;
   min-height: 100vh;
 }
@@ -29,7 +29,7 @@ a {
 }
 
 .glass-surface {
-  @apply rounded-2xl border border-white/40 bg-white/75 shadow-brand-soft backdrop-blur-lg;
+  @apply rounded-2xl border border-gray-100 bg-white shadow-brand-soft;
 }
 
 .section-heading {

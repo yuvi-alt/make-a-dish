@@ -11,8 +11,8 @@ type ReviewCardProps = {
 
 export function ReviewCard({ title, items, changeHref }: ReviewCardProps) {
   return (
-    <section className="rounded-3xl border border-white/60 bg-white/90 shadow-brand-soft">
-      <header className="flex items-center justify-between gap-3 border-b border-white/60 bg-brand-cream/60 px-6 py-4">
+    <section className="rounded-3xl border border-gray-100 bg-white shadow-brand-soft">
+      <header className="flex items-center justify-between gap-3 border-b border-gray-100 bg-gray-50 px-6 py-4">
         <h3 className="text-xl font-semibold text-brand-charcoal">{title}</h3>
         {changeHref ? (
           <a
@@ -23,7 +23,7 @@ export function ReviewCard({ title, items, changeHref }: ReviewCardProps) {
           </a>
         ) : null}
       </header>
-      <dl className="divide-y divide-brand-cream">
+      <dl className="divide-y divide-gray-100">
         {items.map((item) => {
           const value =
             typeof item.value === "string"

@@ -22,11 +22,11 @@ export function FormShell({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="grid gap-8 lg:grid-cols-[320px,1fr]">
-        <div className="glass-surface h-fit rounded-[32px] bg-white/85 p-6">
+        <div className="glass-surface h-fit rounded-[32px] bg-white p-6">
           <StepIndicator currentStep={currentStep} entityType={entityType} />
         </div>
         <div className="space-y-6">
-          <div className="glass-surface rounded-[32px] bg-white/90 p-8 shadow-brand">
+          <div className="glass-surface rounded-[32px] bg-white p-8 shadow-brand">
             <div className="mb-8 space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-charcoal/60">
                 Food business registration

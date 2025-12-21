@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         brand: {
           cream: "#FFF9F3",
+          "warm-white": "#FAF7F2",
           butter: "#FFE7C2",
           peach: "#FFC8A9",
           tangerine: "#FF8A5C",

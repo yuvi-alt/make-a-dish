@@ -51,7 +51,7 @@ type InfoCardProps = {
 const accentMap: Record<NonNullable<InfoCardProps["accent"]>, string> = {
   peach: "from-brand-peach/70 to-brand-butter/80 text-brand-charcoal",
   green: "from-brand-sprout/30 to-brand-mint/80 text-brand-charcoal",
-  cream: "from-white to-brand-cream text-brand-charcoal",
+  cream: "from-white to-brand-warm-white text-brand-charcoal",
 };
 
 export function InfoCard({
